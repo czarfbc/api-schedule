@@ -14,7 +14,7 @@ class UsersServices{
         }
 
         const hashPassword = await hash(password, 10)
-        const create = this.usersRepository.create({name, email, password: hashPassword})
+        const create = await this.usersRepository.create({name, email, password: hashPassword})
 
         return create
     }

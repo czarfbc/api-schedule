@@ -12,10 +12,10 @@ class UsersController{
     show() {
 
     }
-    store(request:Request, response:Response, next:NextFunction) {
+    async store(request:Request, response:Response, next:NextFunction) {
         const {name, email, password} = request.body
         try {
-            const result = this.usersServices.create({name, email, password})
+            const result = await this.usersServices.create({name, email, password})
 
             return response.status(201).json(result)
         } catch (error) {
@@ -24,6 +24,14 @@ class UsersController{
     }
     auth() {
 
+    }
+    update(request:Request, response:Response, next:NextFunction) {
+        const {name, oldPassword, newPassword} = request.body
+        console.log(request.files)
+        try {
+        } catch (error) {
+            next(error)
+        }
     }
 }
 export {UsersController}
