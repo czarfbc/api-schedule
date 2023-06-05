@@ -1,6 +1,5 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { UserRoutes } from './routes/users.routes';
-import multer from 'multer';
 
 const app:Application = express();
 
@@ -8,9 +7,8 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 const usersRoutes = new UserRoutes().getRoutes()
-const upload = multer()
 
-app.use('/users', upload.any(), usersRoutes)
+app.use('/users', usersRoutes)
 
 app.use((err:Error, request:Request, response:Response, next:NextFunction) => {
     if(err instanceof Error) {
