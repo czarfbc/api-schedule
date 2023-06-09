@@ -1,9 +1,10 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { UserRoutes } from './routes/users.routes';
 import { SchedulesRoutes } from './routes/schedules.routes';
+import cors from 'cors';
 
 const app:Application = express();
-
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 

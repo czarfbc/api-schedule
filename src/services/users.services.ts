@@ -3,7 +3,7 @@ import { ICreate, IUpdate } from "../interfaces/users.interface"
 import { UsersRepository } from "../repositories/users.repository"
 import { s3 } from "../config/aws";
 import { v4 as uuid } from "uuid"
-import { sign } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 
 class UsersServices{
     private usersRepository:UsersRepository
@@ -67,21 +67,43 @@ class UsersServices{
 
         let secretkey: string | undefined = process.env.ACCESS_KEY_TOKEN
         if(!secretkey) {
-            throw new Error('There i no token key')
+            throw new Error('There is no token key')
         }
 
         const token = sign({email}, secretkey, {
             subject: findUser.id,
             expiresIn: 60 * 15,
         })
+        const refreshToken = sign({email}, secretkey, {
+            subject: findUser.id,
+            expiresIn: '7d',
+        })
 
         return {
             token,
+            refresh_token: refreshToken,
             user: {
                 name: findUser.name,
                 email: findUser.email,
             },
         }
+    }
+
+    async refresh(refresh_token: string) {
+        if(!refresh_token) {
+            throw new Error('Refresh token missing')
+        }
+        let secretkey: string | undefined = process.env.ACCESS_KEY_TOKEN
+        if(!secretkey) {
+            throw new Error('There is no refresh token key')
+        }
+        const verifyRefreshToken = verify(refresh_token, secretkey)
+
+        const { sub } = verifyRefreshToken
+        const newToken = sign({sub}, secretkey, {
+            expiresIn: 60 * 15,
+        })
+        return {token: newToken}
     }
 }
 export {UsersServices}

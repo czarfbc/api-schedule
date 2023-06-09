@@ -29,6 +29,11 @@ class UserRoutes{
             this.usersController.auth.bind(this.usersController)
         )
 
+        this.router.post(
+            '/refresh', 
+            this.usersController.refresh.bind(this.usersController)
+        )
+
         return this.router;
     }
 }
