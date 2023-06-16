@@ -17,7 +17,7 @@ app.use('/schedules', schedulesRoutes)
 app.use((err:Error, request:Request, response:Response, next:NextFunction) => {
     if(err instanceof Error) {
         return response.status(400).json({
-            messagr: err.message,
+            message: err.message,
         })
     }
     return response.status(500).json({
