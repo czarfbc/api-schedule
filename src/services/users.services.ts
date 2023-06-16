@@ -59,8 +59,8 @@ class UsersServices{
         if(!findUser) {
             throw new Error('User or password invalid')
         }
-
         const  passwordMatch = compare(password, findUser.password)
+
         if(!passwordMatch) {
             throw new Error('User or password invalid')
         }
@@ -69,12 +69,17 @@ class UsersServices{
         if(!secretkey) {
             throw new Error('There is no token key')
         }
+        let secretKeyRefreshToken: string | undefined =
+            process.env.ACCESS_KEY_TOKEN_REFRESH;
+        if (!secretKeyRefreshToken) {
+            throw new Error('There is no token key');
+        }
 
         const token = sign({email}, secretkey, {
             subject: findUser.id,
-            expiresIn: 60 * 15,
+            expiresIn: '60s',
         })
-        const refreshToken = sign({email}, secretkey, {
+        const refreshToken = sign({email}, secretKeyRefreshToken, {
             subject: findUser.id,
             expiresIn: '7d',
         })
@@ -85,6 +90,7 @@ class UsersServices{
             user: {
                 name: findUser.name,
                 email: findUser.email,
+                avatar_url: findUser.avatar_url,
             },
         }
     }
