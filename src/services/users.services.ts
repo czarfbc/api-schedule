@@ -100,10 +100,14 @@ class UsersServices{
         const verifyRefreshToken = verify(refresh_token, secretkey)
 
         const { sub } = verifyRefreshToken
+        
         const newToken = sign({sub}, secretkey, {
-            expiresIn: 60 * 15,
+            expiresIn: '1h',
         })
-        return {token: newToken}
+        const refreshToken = sign({sub}, secretkey, {
+            expiresIn: '7d'
+        })
+        return {token: newToken, refresh_token: refreshToken}
     }
 }
 export {UsersServices}
