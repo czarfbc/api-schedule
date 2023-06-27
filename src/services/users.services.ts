@@ -65,16 +65,20 @@ class UsersServices{
             throw new Error('User or password invalid')
         }
 
-        let secretkey: string | undefined = process.env.ACCESS_KEY_TOKEN
-        if(!secretkey) {
+        let secretKey: string | undefined = process.env.ACCESS_KEY_TOKEN
+        if(!secretKey) {
+            throw new Error('There is no token key')
+        }
+        let secretkeyRefreshToken: string | undefined = process.env.ACCESS_KEY_TOKEN_Refresh
+        if(!secretkeyRefreshToken) {
             throw new Error('There is no token key')
         }
 
-        const token = sign({email}, secretkey, {
+        const token = sign({email}, secretKey, {
             subject: findUser.id,
-            expiresIn: 60 * 15,
+            expiresIn: '60s',
         })
-        const refreshToken = sign({email}, secretkey, {
+        const refreshToken = sign({email}, secretkeyRefreshToken, {
             subject: findUser.id,
             expiresIn: '7d',
         })
@@ -85,6 +89,7 @@ class UsersServices{
             user: {
                 name: findUser.name,
                 email: findUser.email,
+                avatar_url: findUser.avatar_url,
             },
         }
     }
@@ -93,18 +98,24 @@ class UsersServices{
         if(!refresh_token) {
             throw new Error('Refresh token missing')
         }
-        let secretkey: string | undefined = process.env.ACCESS_KEY_TOKEN
-        if(!secretkey) {
+        let secretkeyRefreshToken: string | undefined = process.env.ACCESS_KEY_TOKEN_REFRESH
+        if(!secretkeyRefreshToken) {
             throw new Error('There is no refresh token key')
         }
-        const verifyRefreshToken = verify(refresh_token, secretkey)
+
+        let secretKey: string | undefined = process.env.ACCESS_KEY_TOKEN
+        if(!secretKey) {
+            throw new Error('There is no refresh token key')
+        }
+ 
+        const verifyRefreshToken = verify(refresh_token, secretkeyRefreshToken)
 
         const { sub } = verifyRefreshToken
         
-        const newToken = sign({sub}, secretkey, {
+        const newToken = sign({sub}, secretKey, {
             expiresIn: '1h',
         })
-        const refreshToken = sign({sub}, secretkey, {
+        const refreshToken = sign({sub}, secretkeyRefreshToken, {
             expiresIn: '7d'
         })
         return {token: newToken, refresh_token: refreshToken}
