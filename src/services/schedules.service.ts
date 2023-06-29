@@ -12,7 +12,7 @@ class SchedulesService {
         const hourStart = startOfHour(dateFormatted)
         const hour = getHours(hourStart)
 
-        if(hour <= 9 || hour >= 19) {
+        if(hour <= 8 || hour >= 20) {
             throw new Error('Create Schedule between 9 and 19')
         }
 
@@ -35,6 +35,7 @@ class SchedulesService {
         return result
     }
     async update(id: string, date: Date, user_id: string) {
+        console.log("🚀 ~ file: schedules.service.ts:38 ~ SchedulesService ~ update ~ date:", date)
         const dateFormatted = new Date(date)
         const hourStart = startOfHour(dateFormatted)
 
