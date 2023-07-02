@@ -17,12 +17,12 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/multer": "^1.4.7",
     "@types/uuid": "^9.0.1",
-    "prisma": "^4.16.0-dev.8",
+    "prisma": "^4.17.0-dev.47",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@prisma/client": "^4.15.0",
+    "@prisma/client": "^4.17.0-dev.47",
     "aws-sdk": "^2.1389.0",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
