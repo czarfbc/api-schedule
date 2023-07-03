@@ -12,19 +12,19 @@ class SchedulesService {
         const hourStart = startOfHour(dateFormatted)
         const hour = getHours(hourStart)
 
-        console.log(' if(hour <= 8 || hour >= 20)')
+        
         if(hour <= 8 || hour >= 20) {
             throw new Error('Create Schedule between 9 and 19')
         }
 
-        console.log('if(isBefore(hourStart, new Date()))')
+        
         if(isBefore(hourStart, new Date())) {
             throw new Error('It is not allowed to schedule old date')
         }
 
         const checkIsAvailable = await this.schedulesRepository.find(hourStart, user_id)
 
-        console.log('if(checkIsAvailable)')
+        
         if(checkIsAvailable) {
             throw new Error('Schedule date is not available')
         }
@@ -38,19 +38,23 @@ class SchedulesService {
         return result
     }
     async update(id: string, date: Date, user_id: string) {
-        console.log("🚀 ~ file: schedules.service.ts:38 ~ SchedulesService ~ update ~ date:", date)
         const dateFormatted = new Date(date)
         const hourStart = startOfHour(dateFormatted)
 
+       
         if(isBefore(hourStart, new Date())) {
+ 
             throw new Error('It is not allowed to schedule old date')
         }
+      
 
         const checkIsAvailable = await this.schedulesRepository.find(hourStart, user_id)
-
+        
         if(checkIsAvailable) {
+          
             throw new Error('Schedule date is not available')
         }
+        
 
         const result = await this.schedulesRepository.update(id, date)
         return result
