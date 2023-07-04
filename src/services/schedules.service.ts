@@ -1,5 +1,5 @@
 import { ICreate } from "../interfaces/schedules.interface";
-import { getHours, isBefore, startOfHour } from "date-fns";
+import { getHours, isBefore, startOfHour, getMinutes, startOfMinute } from "date-fns";
 import { SchedulesRepository } from "../repositories/services.repository";
 
 class SchedulesService {
@@ -9,27 +9,30 @@ class SchedulesService {
     }
     async create({name, phone, date, user_id}: ICreate) {
         const dateFormatted = new Date(date)
-        const hourStart = startOfHour(dateFormatted)
-        const hour = getHours(hourStart)
+        //const hourStart = startOfHour(dateFormatted)
+
+        const minuteStart = startOfMinute(dateFormatted)
+
+        const hour = getHours(dateFormatted)
+        const minutes = getMinutes(dateFormatted)
+        
+        // if(hour <= 8 || hour >= 20) {
+        //     throw new Error('Create Schedule between 9 and 19')
+        // }
 
         
-        if(hour <= 8 || hour >= 20) {
-            throw new Error('Create Schedule between 9 and 19')
-        }
-
-        
-        if(isBefore(hourStart, new Date())) {
+        if(isBefore(minuteStart, new Date())) {
             throw new Error('It is not allowed to schedule old date')
         }
 
-        const checkIsAvailable = await this.schedulesRepository.find(hourStart, user_id)
+        const checkIsAvailable = await this.schedulesRepository.find(minuteStart, user_id)
 
         
         if(checkIsAvailable) {
             throw new Error('Schedule date is not available')
         }
 
-        const create = await this.schedulesRepository.create({name, phone, date:hourStart, user_id})
+        const create = await this.schedulesRepository.create({name, phone, date:minuteStart, user_id})
         return create
     }
     async index(date: Date) {
@@ -39,16 +42,17 @@ class SchedulesService {
     }
     async update(id: string, date: Date, user_id: string) {
         const dateFormatted = new Date(date)
-        const hourStart = startOfHour(dateFormatted)
+        //const hourStart = startOfHour(dateFormatted)
 
+        const minuteStart = startOfMinute(dateFormatted)
        
-        if(isBefore(hourStart, new Date())) {
+        if(isBefore(minuteStart, new Date())) {
  
             throw new Error('It is not allowed to schedule old date')
         }
       
 
-        const checkIsAvailable = await this.schedulesRepository.find(hourStart, user_id)
+        const checkIsAvailable = await this.schedulesRepository.find(minuteStart, user_id)
         
         if(checkIsAvailable) {
           
