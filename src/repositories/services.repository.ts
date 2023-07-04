@@ -24,6 +24,12 @@ class SchedulesRepository {
         });
         return result;
     }
+    async findById(id: string) {
+        const result = await prisma.schedule.findUnique({
+            where: {id},
+        })
+        return result
+    }
     async findAll(date: Date) {
         const result = await prisma.schedule.findMany({
             where: {
@@ -46,6 +52,12 @@ class SchedulesRepository {
             data: {
                 date,
             }
+        })
+        return result
+    }
+    async delete(id: string) {
+        const result = await prisma.schedule.delete({
+            where: {id},
         })
         return result
     }

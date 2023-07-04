@@ -59,5 +59,8 @@ class SchedulesService {
         const result = await this.schedulesRepository.update(id, date)
         return result
     }
+    async delete(id: string) {
+        const checkExists = await this.schedulesRepository.delete(id)
+    }
 }
 export { SchedulesService }
