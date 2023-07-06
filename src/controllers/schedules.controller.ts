@@ -20,9 +20,10 @@ class SchedulesController {
     }
     async index(request: Request, response: Response, next: NextFunction) {
         const { date } = request.query
+        const { user_id } = request 
         const parseDate = date ? parseISO(date.toString()) : new Date()
         try {
-            const result = await this.schedulesService.index(parseDate)
+            const result = await this.schedulesService.index(parseDate, user_id)
             
             return response.json(result)
         } catch (error) {

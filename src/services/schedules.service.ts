@@ -9,18 +9,9 @@ class SchedulesService {
     }
     async create({name, phone, date, user_id}: ICreate) {
         const dateFormatted = new Date(date)
-        //const hourStart = startOfHour(dateFormatted)
 
         const minuteStart = startOfMinute(dateFormatted)
-
-        const hour = getHours(dateFormatted)
-        const minutes = getMinutes(dateFormatted)
-        
-        // if(hour <= 8 || hour >= 20) {
-        //     throw new Error('Create Schedule between 9 and 19')
-        // }
-
-        
+      
         if(isBefore(minuteStart, new Date())) {
             throw new Error('It is not allowed to schedule old date')
         }
@@ -35,14 +26,13 @@ class SchedulesService {
         const create = await this.schedulesRepository.create({name, phone, date:minuteStart, user_id})
         return create
     }
-    async index(date: Date) {
-        const result = await this.schedulesRepository.findAll(date)
+    async index(date: Date, user_id: string) {
+        const result = await this.schedulesRepository.findAll(date, user_id)
         
         return result
     }
     async update(id: string, date: Date, user_id: string) {
         const dateFormatted = new Date(date)
-        //const hourStart = startOfHour(dateFormatted)
 
         const minuteStart = startOfMinute(dateFormatted)
        

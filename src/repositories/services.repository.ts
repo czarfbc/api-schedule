@@ -30,13 +30,14 @@ class SchedulesRepository {
         })
         return result
     }
-    async findAll(date: Date) {
+    async findAll(date: Date, user_id: string) {
         const result = await prisma.schedule.findMany({
             where: {
                 date: {
                     gte: startOfDay(date),
                     lt: endOfDay(date),
                 },
+                user_id,
             },
             orderBy: {
                 date: 'asc'
