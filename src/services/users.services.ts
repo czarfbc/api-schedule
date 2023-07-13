@@ -59,7 +59,7 @@ class UsersServices {
         .promise();
       console.log("url imagem <<=>>", uploadS3.Location);
 
-      await this.usersRepository.update(name, uploadS3.Location, user_id);
+      await this.usersRepository.update(name, /*uploadS3.Location,*/ user_id);
     }
     return {
       message: "Usuário atualizado com sucesso",
@@ -102,7 +102,7 @@ class UsersServices {
       user: {
         name: findUser.name,
         email: findUser.email,
-        avatar_url: findUser.avatar_url,
+        //avatar_url: findUser.avatar_url,
       },
     };
   }
