@@ -27,4 +27,4 @@ app.use(
   }
 );
 
-app.listen(process.env.PORT, () => console.log("Servidor Rodando"));
+app.listen(3000, () => console.log("Servidor Rodando"));
