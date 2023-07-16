@@ -8,7 +8,7 @@ class SchedulesController {
     this.schedulesService = new SchedulesService();
   }
   async store(request: Request, response: Response, next: NextFunction) {
-    const { name, phone, date } = request.body;
+    const { name, phone, date, description } = request.body;
     const { user_id } = request;
     try {
       const result = await this.schedulesService.create({
@@ -16,6 +16,7 @@ class SchedulesController {
         phone,
         date,
         user_id,
+        description,
       });
 
       return response.status(201).json(result);

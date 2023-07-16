@@ -19,10 +19,11 @@ model Users {
 }
 
 model Schedule {
-  id      String   @id @default(uuid())
-  name    String
-  phone   String
-  date    DateTime
-  user_id String   @default("")
-  users   Users    @relation(fields: [user_id], references: [id])
+  id          String   @id @default(uuid())
+  name        String
+  phone       String
+  description String   @default("")
+  date        DateTime
+  user_id     String   @default("")
+  users       Users    @relation(fields: [user_id], references: [id])
 }

@@ -13,7 +13,7 @@ class SchedulesService {
   constructor() {
     this.schedulesRepository = new SchedulesRepository();
   }
-  async create({ name, phone, date, user_id }: ICreate) {
+  async create({ name, phone, date, user_id, description }: ICreate) {
     const dateFormatted = new Date(date);
 
     const minuteStart = startOfMinute(dateFormatted);
@@ -36,6 +36,7 @@ class SchedulesService {
       phone,
       date: minuteStart,
       user_id,
+      description,
     });
     return create;
   }
