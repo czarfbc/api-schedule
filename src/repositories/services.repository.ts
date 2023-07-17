@@ -4,10 +4,6 @@ import { ICreate } from "../interfaces/schedules.interface";
 
 class SchedulesRepository {
   async create({ name, phone, date, user_id, description }: ICreate) {
-    console.log(
-      "🚀 ~ file: services.repository.ts:7 ~ SchedulesRepository ~ create ~ user_id:",
-      user_id
-    );
     const result = await prisma.schedule.create({
       data: {
         name,
