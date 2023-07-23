@@ -45,13 +45,15 @@ class SchedulesRepository {
     });
     return result;
   }
-  async update(id: string, date: Date) {
+  async update(id: string, date: Date, phone: string, description: string) {
     const result = await prisma.schedule.update({
       where: {
         id,
       },
       data: {
         date,
+        phone,
+        description,
       },
     });
     return result;

@@ -38,10 +38,16 @@ class SchedulesController {
   }
   async update(request: Request, response: Response, next: NextFunction) {
     const { id } = request.params;
-    const { date } = request.body;
+    const { date, phone, description } = request.body;
     const { user_id } = request;
     try {
-      const result = await this.schedulesService.update(id, date, user_id);
+      const result = await this.schedulesService.update(
+        id,
+        date,
+        user_id,
+        phone,
+        description
+      );
 
       return response.json(result);
     } catch (error) {

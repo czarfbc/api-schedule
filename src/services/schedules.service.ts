@@ -45,7 +45,13 @@ class SchedulesService {
 
     return result;
   }
-  async update(id: string, date: Date, user_id: string) {
+  async update(
+    id: string,
+    date: Date,
+    user_id: string,
+    phone: string,
+    description: string
+  ) {
     const dateFormatted = new Date(date);
 
     const minuteStart = startOfMinute(dateFormatted);
@@ -63,7 +69,12 @@ class SchedulesService {
       throw new Error("A data agendada não está disponível");
     }
 
-    const result = await this.schedulesRepository.update(id, date);
+    const result = await this.schedulesRepository.update(
+      id,
+      date,
+      phone,
+      description
+    );
     return result;
   }
   async delete(id: string) {
