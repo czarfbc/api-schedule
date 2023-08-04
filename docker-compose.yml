@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  pgsql:
+    image: 'postgres'
+    ports:
+      - '${DB_PORT:-5432}:5432'
+    environment:
+      PGPASSWORD: '${DB_PASSWORD:-postgres}'
+      POSTGRES_USER: '${DB_USER:-postgres}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD:-postgres}'
+      POSTGRES_DB: '${DB_NAME:-postgres}'
+    volumes:
+      - 'pgsql:/var/lib/postgresql/data'
+    networks:
+      - dockernetwork
+    healthcheck:
+      test:
+        - CMD
+        - pg_isready
+        - '-q'
+        - '-d'
+        - '${DB_DATABASE:-postgres}'
+        - '-U'
+        - '${DB_USER:-postgres}'
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+networks:
+  dockernetwork:
+    driver: 'bridge'
+
+volumes:
+  pgsql:
+    driver: local
