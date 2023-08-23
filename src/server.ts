@@ -5,13 +5,7 @@ import cors from "cors";
 
 const app: Application = express();
 
-const corsOptions = {
-  origin: "https://schedulesystem.com.br", // Coloque o domínio autorizado aqui
-  methods: "GET, POST, PUT, DELETE", // Métodos HTTP permitidos
-  optionsSuccessStatus: 204, // Código de status para preflight requests
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -1,8 +1,6 @@
 import { compare, hash } from "bcrypt";
 import { ICreate, IUpdate } from "../interfaces/users.interface";
 import { UsersRepository } from "../repositories/users.repository";
-import { s3 } from "../config/aws";
-import { v4 as uuid } from "uuid";
 import { sign, verify } from "jsonwebtoken";
 
 class UsersServices {
@@ -25,13 +23,7 @@ class UsersServices {
 
     return create;
   }
-  async update({
-    name,
-    oldPassword,
-    newPassword,
-    avatar_url,
-    user_id,
-  }: IUpdate) {
+  async update({ oldPassword, newPassword, user_id }: IUpdate) {
     let password;
     if (oldPassword && newPassword) {
       const findUserById = await this.usersRepository.findUserById(user_id);
@@ -46,20 +38,6 @@ class UsersServices {
       password = await hash(newPassword, 10);
 
       await this.usersRepository.updatePassword(password, user_id);
-    }
-    if (avatar_url) {
-      const uploadImage = avatar_url?.buffer;
-      const uploadS3 = await s3
-        .upload({
-          Bucket: "semana--heroi",
-          Key: `${uuid()}-${avatar_url?.originalname}`,
-          //ACL: 'public-read',
-          Body: uploadImage,
-        })
-        .promise();
-      console.log("url imagem <<=>>", uploadS3.Location);
-
-      await this.usersRepository.update(name, /*uploadS3.Location,*/ user_id);
     }
     return {
       message: "Usuário atualizado com sucesso",
