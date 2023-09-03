@@ -15,4 +15,4 @@ faça um arquivo na raiz do projeto chamado ".env", e nele adicione as variávei
  PORT = aqui coloque uma porta para o codigo ser exectado (opcional)
  #
 
-yarn dev
+POR ÚLTIMO `yarn dev`
