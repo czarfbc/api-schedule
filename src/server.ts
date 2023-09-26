@@ -5,6 +5,12 @@ import cors from "cors";
 
 const app: Application = express();
 
+const corsOptions = {
+  origin: "http://localhost:3003",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  optionsSuccessStatus: 204,
+};
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
