@@ -1,11 +1,5 @@
 import { ICreate } from "../interfaces/schedules.interface";
-import {
-  getHours,
-  isBefore,
-  startOfHour,
-  getMinutes,
-  startOfMinute,
-} from "date-fns";
+import { isBefore, startOfMinute } from "date-fns";
 import { SchedulesRepository } from "../repositories/services.repository";
 
 class SchedulesService {
@@ -22,7 +16,7 @@ class SchedulesService {
       throw new Error("Não é permitido agendar data antiga");
     }
 
-    const checkIsAvailable = await this.schedulesRepository.find(
+    const checkIsAvailable = await this.schedulesRepository.findAll(
       minuteStart,
       user_id
     );
@@ -40,11 +34,22 @@ class SchedulesService {
     });
     return create;
   }
+
   async index(date: Date, user_id: string) {
+    const result = await this.schedulesRepository.findEverythingOfTheDay(
+      date,
+      user_id
+    );
+
+    return result;
+  }
+
+  async indexes(date: Date, user_id: string) {
     const result = await this.schedulesRepository.findAll(date, user_id);
 
     return result;
   }
+
   async update(
     id: string,
     date: Date,
@@ -60,7 +65,7 @@ class SchedulesService {
       throw new Error("Não é permitido agendar data antiga");
     }
 
-    const checkIsAvailable = await this.schedulesRepository.find(
+    const checkIsAvailable = await this.schedulesRepository.findAll(
       minuteStart,
       user_id
     );
@@ -77,8 +82,9 @@ class SchedulesService {
     );
     return result;
   }
+
   async delete(id: string) {
-    const checkExists = await this.schedulesRepository.delete(id);
+    await this.schedulesRepository.delete(id);
   }
 }
 export { SchedulesService };

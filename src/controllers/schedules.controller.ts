@@ -24,6 +24,7 @@ class SchedulesController {
       next(error);
     }
   }
+
   async index(request: Request, response: Response, next: NextFunction) {
     const { date } = request.query;
     const { user_id } = request;
@@ -36,6 +37,20 @@ class SchedulesController {
       next(error);
     }
   }
+
+  async indexes(request: Request, response: Response, next: NextFunction) {
+    const { date } = request.query;
+    const { user_id } = request;
+    const parseDate = date ? parseISO(date.toString()) : new Date();
+    try {
+      const result = await this.schedulesService.indexes(parseDate, user_id);
+
+      return response.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async update(request: Request, response: Response, next: NextFunction) {
     const { id } = request.params;
     const { date, phone, description } = request.body;
@@ -54,6 +69,7 @@ class SchedulesController {
       next(error);
     }
   }
+
   async delete(request: Request, response: Response, next: NextFunction) {
     const { id } = request.params;
     try {
