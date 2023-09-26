@@ -16,10 +16,11 @@ class SchedulesService {
       throw new Error("Não é permitido agendar data antiga");
     }
 
-    const checkIsAvailable = await this.schedulesRepository.findAll(
-      minuteStart,
-      user_id
-    );
+    const checkIsAvailable =
+      await this.schedulesRepository.findIfVerificationIsAvailable(
+        minuteStart,
+        user_id
+      );
 
     if (checkIsAvailable) {
       throw new Error("A data agendada não está disponível");
@@ -44,8 +45,8 @@ class SchedulesService {
     return result;
   }
 
-  async indexes(date: Date, user_id: string) {
-    const result = await this.schedulesRepository.findAll(date, user_id);
+  async indexes(user_id: string) {
+    const result = await this.schedulesRepository.findAll(user_id);
 
     return result;
   }
@@ -65,10 +66,11 @@ class SchedulesService {
       throw new Error("Não é permitido agendar data antiga");
     }
 
-    const checkIsAvailable = await this.schedulesRepository.findAll(
-      minuteStart,
-      user_id
-    );
+    const checkIsAvailable =
+      await this.schedulesRepository.findIfVerificationIsAvailable(
+        minuteStart,
+        user_id
+      );
 
     if (checkIsAvailable) {
       throw new Error("A data agendada não está disponível");

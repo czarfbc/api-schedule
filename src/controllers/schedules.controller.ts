@@ -39,11 +39,9 @@ class SchedulesController {
   }
 
   async indexes(request: Request, response: Response, next: NextFunction) {
-    const { date } = request.query;
     const { user_id } = request;
-    const parseDate = date ? parseISO(date.toString()) : new Date();
     try {
-      const result = await this.schedulesService.indexes(parseDate, user_id);
+      const result = await this.schedulesService.indexes(user_id);
 
       return response.json(result);
     } catch (error) {

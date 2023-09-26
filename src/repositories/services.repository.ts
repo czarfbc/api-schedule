@@ -20,13 +20,23 @@ class SchedulesRepository {
     return result;
   }
 
-  async findAll(date: Date, user_id: string) {
-    const result = await prisma.schedule.findFirst({
+  async findAll(user_id: string) {
+    const result = await prisma.schedule.findMany({
       where: {
         user_id,
       },
       orderBy: {
         date: "asc",
+      },
+    });
+    return result;
+  }
+
+  async findIfVerificationIsAvailable(date: Date, user_id: string) {
+    const result = await prisma.schedule.findFirst({
+      where: {
+        date,
+        user_id,
       },
     });
     return result;
