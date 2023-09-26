@@ -1,4 +1,4 @@
-# api-hero-code
+# api-schedule 
  
 npm install prisma --save-dev
 #
