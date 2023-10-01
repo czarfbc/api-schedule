@@ -6,8 +6,7 @@ class UsersController {
   constructor() {
     this.usersServices = new UsersServices();
   }
-  index() {}
-  show() {}
+
   async store(request: Request, response: Response, next: NextFunction) {
     const { name, email, password } = request.body;
     try {
@@ -18,6 +17,7 @@ class UsersController {
       next(error);
     }
   }
+
   async auth(request: Request, response: Response, next: NextFunction) {
     const { email, password } = request.body;
     try {
@@ -27,6 +27,7 @@ class UsersController {
       next(error);
     }
   }
+
   async refresh(request: Request, response: Response, next: NextFunction) {
     const { refresh_token } = request.body;
     try {
@@ -36,6 +37,7 @@ class UsersController {
       next(error);
     }
   }
+
   async update(request: Request, response: Response, next: NextFunction) {
     const { name, oldPassword, newPassword } = request.body;
     const { user_id } = request;
