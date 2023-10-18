@@ -194,7 +194,7 @@ _.base_url/schedules
 Vai ser passado o seguite array de objetos, a quantidade de objeto será respectivo à quantidade de agendamentos que tiver no dia
 ```json
 [
-	{
+{
         "id": "id da agenda criada",
         "name": "nome do cliente dado",
         "phone": "se passado vai ser retornado",
@@ -219,7 +219,7 @@ _.base_url/schedules/getall
 Vai ser passado o seguite array de objetos, a quantidade de objeto será respectivo à quantidade de agendamentos que tiver no totl
 ```json
 [
-	{
+{
         "id": "id da agenda criada",
         "name": "nome do cliente dado",
         "phone": "se passado vai ser retornado",
