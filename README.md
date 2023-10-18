@@ -31,7 +31,7 @@ $ yarn dev
 ### Para fazer o signup de usuário: 
 Método `POST`
  
- ```json
+ ```
 _.base_url/users
 ```
 #### Será passado os parametros:
@@ -57,7 +57,7 @@ _.base_url/users
 ### Para fazer a autenticação de usuário: 
  Método `POST`
 
- ```json
+ ```
 _.base_url/users/auth
 ```
 #### Será passado os parametros:
@@ -84,7 +84,7 @@ _.base_url/users/auth
 Método `POST`
 
  
- ```json
+ ```
 _.base_url/users/refresh
 ```
 #### Será passado os parametros:
@@ -111,7 +111,7 @@ _.base_url/users/refresh
 Método `POST`
 
  
- ```json
+ ```
 _.base_url/schedules
 ```
 #### Será passado os parametros juntamente ao bearer token:
@@ -141,7 +141,7 @@ _.base_url/schedules
 Método `PATCH`
 
  
- ```json
+ ```
 _.base_url/schedules/:id_do_agendamento
 ```
 #### Será passado os parametros juntamente ao bearer token:
@@ -170,7 +170,7 @@ _.base_url/schedules/:id_do_agendamento
 Método `DELETE`
 
  
- ```json
+ ```
 _.base_url/schedules/:id_do_agendamento
 ```
 #### Será passado o bearer token:
@@ -185,14 +185,14 @@ HttpStatusCode(204)
 Método `GET`
 
  
- ```json
+ ```
 _.base_url/schedules
 ```
 #### Será passado o bearer token:
 
 #### Resposta
-```json
 Vai ser passado o seguite array de objetos, a quantidade de objeto será respectivo à quantidade de agendamentos que tiver no dia
+```json
 [
 	{
         "id": "id da agenda criada",
@@ -210,14 +210,14 @@ Vai ser passado o seguite array de objetos, a quantidade de objeto será respect
 Método `GET`
 
  
- ```json
+ ```
 _.base_url/schedules/getall
 ```
 #### Será passado o bearer token:
 
 #### Resposta
-```json
 Vai ser passado o seguite array de objetos, a quantidade de objeto será respectivo à quantidade de agendamentos que tiver no totl
+```json
 [
 	{
         "id": "id da agenda criada",
