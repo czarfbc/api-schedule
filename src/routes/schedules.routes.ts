@@ -30,7 +30,7 @@ class SchedulesRoutes {
       this.schedulesController.indexes.bind(this.schedulesController)
     );
 
-    this.router.put(
+    this.router.patch(
       "/:id",
       this.authMiddleware.auth.bind(this.authMiddleware),
       this.schedulesController.update.bind(this.schedulesController)
