@@ -1,19 +1,26 @@
-# EM BUSCA DE UMA DOCUMENTAÇÃO DECENTE
-# api-schedule 
- 
-npm install prisma --save-dev
-#
-yarn instal
-#
-faça um arquivo na raiz do projeto chamado ".env", e nele adicione as variáveis:
-#
- DATABASE_URL = aqui coloque a url de conecção do banco de dados postgresql
- #
- ACCESS_KEY_TOKEN = aqui coloque uma chave criptografada qualquer
- #
- ACCESS_KEY_TOKEN_REFRESH = aqui coloque uma chave criptografada qualquer mas diferente da ACCESS_KEY_TOKEN
- #
- PORT = aqui coloque uma porta para o codigo ser exectado (opcional)
- #
+# README 
+## Configurar o projeto
 
-POR ÚLTIMO `yarn dev`
+Será nescessário instalar as dependencias
+
+```bash
+$ yarn install
+$ npm install prisma --save-dev
+```
+
+É preciso criar um arquivo na raiz do projeto, para colocar variáveis de ambiente, chamado ``` .env ```
+```typescript
+DATABASE_URL = url de conexão com o postgresql
+
+ACCESS_KEY_TOKEN = coloque uma chave criptografada
+
+ACCESS_KEY_TOKEN_REFRESH = coloque uma chave criptografada diferente da chave interior
+
+PORT = coloque sua porta de preferencia (opcional)
+```
+
+Para iniciar a API use o comando 
+
+```bash
+$ yarn dev
+```
