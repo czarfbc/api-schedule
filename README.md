@@ -29,6 +29,7 @@ $ yarn dev
 #### `._base_url = http://localhost:3000`
 
 ### Para fazer o signup de usuário: 
+Método `POST`
  
  ```json
 _.base_url/users
@@ -54,7 +55,8 @@ _.base_url/users
 
 
 ### Para fazer a autenticação de usuário: 
- 
+ Método `POST`
+
  ```json
 _.base_url/users/auth
 ```
@@ -79,6 +81,8 @@ _.base_url/users/auth
 
 
 ### Para atualizar o token caso expire: 
+Método `POST`
+
  
  ```json
 _.base_url/users/refresh
@@ -95,4 +99,133 @@ _.base_url/users/refresh
 	"token": "novo token gerado",
 	"refresh_token": "novo refresh_token gerado"
 }
+```
+
+
+
+
+## Endpoints Agenda
+#### `._base_url = http://localhost:3000`
+
+### Para criar um agendamento: 
+Método `POST`
+
+ 
+ ```json
+_.base_url/schedules
+```
+#### Será passado os parametros juntamente ao bearer token:
+
+```json
+{
+	"name": "nome do cliente",
+	"phone": "opcional",
+    "description": "opcional",
+	"date": "data no formato: Timestamp => ISO-8601"
+}
+```
+#### Resposta
+```json
+{
+	"id": "id da agenda criada",
+	"name": "nome do cliente dado",
+	"phone": "se passado vai ser retornado",
+	"description": "se passado vai ser retornado",
+	"date": "data passada",
+	"user_id": "id do usuário que criou a agenda"
+}
+```
+
+
+### Para fazer a atualização de um agendamento: 
+Método `PATCH`
+
+ 
+ ```json
+_.base_url/schedules/:id_do_agendamento
+```
+#### Será passado os parametros juntamente ao bearer token:
+```json
+{
+	"name": "opcional",
+	"phone": "opcional",
+	"description": "opcional",
+	"date": "opcional"
+}
+```
+#### Resposta
+```json
+{
+	"id": "id_do_agendamento",
+	"name": "nome passado ou original",
+	"phone": "phone passado ou original",
+	"description": "desrição passada ou original",
+	"date": "data passada ou original",
+	"user_id": "id do usuario que solicitou atualização"
+}
+```
+
+
+### Para excluir um agendamento: 
+Método `DELETE`
+
+ 
+ ```json
+_.base_url/schedules/:id_do_agendamento
+```
+#### Será passado o bearer token:
+
+#### Resposta
+```
+HttpStatusCode(204)
+```
+
+
+### Para buscar todos os agendamentos do dia: 
+Método `GET`
+
+ 
+ ```json
+_.base_url/schedules
+```
+#### Será passado o bearer token:
+
+#### Resposta
+```json
+Vai ser passado o seguite array de objetos, a quantidade de objeto será respectivo à quantidade de agendamentos que tiver no dia
+[
+	{
+        "id": "id da agenda criada",
+        "name": "nome do cliente dado",
+        "phone": "se passado vai ser retornado",
+        "description": "se passado vai ser retornado",
+        "date": "data passada",
+        "user_id": "id do usuário que criou a agenda"
+    }
+]
+```
+
+
+### Para buscar todos os agendamentos: 
+Método `GET`
+
+ 
+ ```json
+_.base_url/schedules/getall
+```
+#### Será passado o bearer token:
+
+#### Resposta
+```json
+Vai ser passado o seguite array de objetos, a quantidade de objeto será respectivo à quantidade de agendamentos que tiver no totl
+[
+	{
+        "id": "id da agenda criada",
+        "name": "nome do cliente dado",
+        "phone": "se passado vai ser retornado",
+        "description": "se passado vai ser retornado",
+        "date": "data passada",
+        "user_id": "id do usuário que criou a agenda"
+    }
+]
 ```
