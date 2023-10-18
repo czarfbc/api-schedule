@@ -118,9 +118,9 @@ _.base_url/schedules
 
 ```json
 {
-    "name": "nome do cliente",
+        "name": "nome do cliente",
 	"phone": "opcional",
-    "description": "opcional",
+        "description": "opcional",
 	"date": "data no formato: Timestamp => ISO-8601"
 }
 ```
