@@ -73,7 +73,7 @@ class SchedulesController {
     try {
       const result = await this.schedulesService.delete(id);
 
-      return response.status(20).json(result);
+      return response.status(204).json(result);
     } catch (error) {
       next(error);
     }
