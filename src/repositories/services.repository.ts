@@ -20,24 +20,6 @@ class SchedulesRepository {
     return result;
   }
 
-  async deleteOldSchedules(user_id: string) {
-    const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() - 2);
-
-    const result = await prisma.schedule.findMany({
-      where: {
-        user_id,
-      },
-      orderBy: {
-        date: "asc",
-      },
-    });
-    const filteredData = result.filter(
-      (item) => new Date(item.date) < currentDate
-    );
-    return filteredData;
-  }
-
   async findAll(user_id: string) {
     const result = await prisma.schedule.findMany({
       where: {
@@ -48,6 +30,24 @@ class SchedulesRepository {
       },
     });
     return result;
+  }
+
+  async deleteOldSchedules(user_id: string) {
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - 91);
+
+    const result = await this.findAll(user_id);
+    const filteredData = result.filter(
+      (item) => new Date(item.date) < currentDate
+    );
+
+    for (const item of filteredData) {
+      await prisma.schedule.delete({
+        where: { id: item.id },
+      });
+    }
+
+    return filteredData;
   }
 
   async findIfVerificationIsAvailable(date: Date, user_id: string) {
