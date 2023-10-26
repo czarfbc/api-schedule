@@ -30,10 +30,10 @@ class SchedulesRoutes {
       this.schedulesController.indexes.bind(this.schedulesController)
     );
 
-    this.router.get(
+    this.router.delete(
       "/deleteoldschedules",
       this.authMiddleware.auth.bind(this.authMiddleware),
-      this.schedulesController.indexesOld.bind(this.schedulesController)
+      this.schedulesController.deleteOldSchedules.bind(this.schedulesController)
     );
 
     this.router.patch(

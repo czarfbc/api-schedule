@@ -36,12 +36,6 @@ class SchedulesService {
     return create;
   }
 
-  async indexesOld(user_id: string) {
-    const result = await this.schedulesRepository.deleteOldSchedules(user_id);
-
-    return result;
-  }
-
   async index(date: Date, user_id: string) {
     const result = await this.schedulesRepository.findEverythingOfTheDay(
       date,
@@ -93,6 +87,12 @@ class SchedulesService {
 
   async delete(id: string) {
     await this.schedulesRepository.delete(id);
+  }
+
+  async deleteOldSchedules(user_id: string) {
+    const result = await this.schedulesRepository.deleteOldSchedules(user_id);
+
+    return result;
   }
 }
 export { SchedulesService };

@@ -25,18 +25,6 @@ class SchedulesController {
     }
   }
 
-  async indexesOld(request: Request, response: Response, next: NextFunction) {
-    const { user_id } = request;
-
-    try {
-      const result = await this.schedulesService.indexesOld(user_id);
-
-      return response.json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
-
   async index(request: Request, response: Response, next: NextFunction) {
     const { date } = request.query;
     const { user_id } = request;
@@ -84,6 +72,22 @@ class SchedulesController {
     const { id } = request.params;
     try {
       const result = await this.schedulesService.delete(id);
+
+      return response.status(204).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteOldSchedules(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    const { user_id } = request;
+
+    try {
+      const result = await this.schedulesService.deleteOldSchedules(user_id);
 
       return response.status(204).json(result);
     } catch (error) {
