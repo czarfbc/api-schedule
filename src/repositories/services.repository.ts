@@ -20,6 +20,24 @@ class SchedulesRepository {
     return result;
   }
 
+  async deleteOldSchedules(user_id: string) {
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - 2);
+
+    const result = await prisma.schedule.findMany({
+      where: {
+        user_id,
+      },
+      orderBy: {
+        date: "asc",
+      },
+    });
+    const filteredData = result.filter(
+      (item) => new Date(item.date) < currentDate
+    );
+    return filteredData;
+  }
+
   async findAll(user_id: string) {
     const result = await prisma.schedule.findMany({
       where: {

@@ -25,6 +25,18 @@ class SchedulesController {
     }
   }
 
+  async indexesOld(request: Request, response: Response, next: NextFunction) {
+    const { user_id } = request;
+
+    try {
+      const result = await this.schedulesService.indexesOld(user_id);
+
+      return response.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async index(request: Request, response: Response, next: NextFunction) {
     const { date } = request.query;
     const { user_id } = request;
