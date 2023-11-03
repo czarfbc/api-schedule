@@ -13,6 +13,7 @@ CREATE TABLE "Schedule" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
+    "description" TEXT NOT NULL DEFAULT '',
     "date" TIMESTAMP(3) NOT NULL,
     "user_id" TEXT NOT NULL DEFAULT '',
 
