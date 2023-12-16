@@ -5,19 +5,21 @@ class UserRoutes {
   private router: Router;
   private usersController: UsersController;
   private authMiddleware: AuthMiddleware;
+
   constructor() {
     this.router = Router();
     this.usersController = new UsersController();
     this.authMiddleware = new AuthMiddleware();
   }
-  getRoutes() {
+
+  postRoutes() {
     this.router.post(
-      "/",
+      "/create",
       this.usersController.store.bind(this.usersController)
     );
 
     this.router.put(
-      "/",
+      "/update",
 
       this.authMiddleware.auth.bind(this.authMiddleware),
       this.usersController.update.bind(this.usersController)
