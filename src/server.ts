@@ -1,8 +1,8 @@
-import { App } from "./app";
+import { App } from './app';
 
 const corsConfig = {
-  origin: "http://localhost:3003",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  origin: 'http://localhost:3003',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   optionsSuccessStatus: 204,
 };
 

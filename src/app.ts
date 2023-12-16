@@ -1,7 +1,7 @@
-import express, { Application } from "express";
-import { UserRoutes } from "./routes/users.routes";
-import { SchedulesRoutes } from "./routes/schedules.routes";
-import cors, { CorsOptions } from "cors";
+import express, { Application } from 'express';
+import { UserRoutes } from './routes/users.routes';
+import { SchedulesRoutes } from './routes/schedules.routes';
+import cors, { CorsOptions } from 'cors';
 
 export class App {
   private app: Application;
@@ -20,11 +20,11 @@ export class App {
 
   private setupRoutes() {
     const userRouters = new UserRoutes();
-    const userBaseRoute = "/user";
+    const userBaseRoute = '/user';
     this.app.use(userBaseRoute, userRouters.postRoutes());
 
     const schedulesRoutes = new SchedulesRoutes();
-    const scheduleBaseRoute = "/schedules";
+    const scheduleBaseRoute = '/schedules';
     this.app.use(scheduleBaseRoute, schedulesRoutes.postRoutes());
     this.app.use(scheduleBaseRoute, schedulesRoutes.getRoutes());
     this.app.use(scheduleBaseRoute, schedulesRoutes.patchRoutes());

@@ -1,5 +1,5 @@
-import { prisma } from "../database/prisma";
-import { ICreate } from "../interfaces/users.interface";
+import { prisma } from '../database/prisma';
+import { ICreate } from '../interfaces/users.interface';
 
 class UsersRepository {
   async create({ name, email, password }: ICreate) {

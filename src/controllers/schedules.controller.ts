@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { SchedulesService } from "../services/schedules.service";
-import { parseISO } from "date-fns";
+import { NextFunction, Request, Response } from 'express';
+import { SchedulesService } from '../services/schedules.service';
+import { parseISO } from 'date-fns';
 
 class SchedulesController {
   private schedulesService: SchedulesService;
