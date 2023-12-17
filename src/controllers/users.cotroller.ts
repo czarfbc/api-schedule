@@ -7,7 +7,7 @@ class UsersController {
     this.usersServices = new UsersServices();
   }
 
-  async store(request: Request, response: Response, next: NextFunction) {
+  async create(request: Request, response: Response, next: NextFunction) {
     const { name, email, password } = request.body;
     try {
       const result = await this.usersServices.create({ name, email, password });

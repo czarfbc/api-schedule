@@ -15,10 +15,10 @@ class UserRoutes {
   postRoutes() {
     this.router.post(
       '/create',
-      this.usersController.store.bind(this.usersController)
+      this.usersController.create.bind(this.usersController)
     );
 
-    this.router.put(
+    this.router.patch(
       '/update',
 
       this.authMiddleware.auth.bind(this.authMiddleware),

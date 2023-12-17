@@ -1,6 +1,6 @@
 import { ICreate } from '../interfaces/schedules.interface';
 import { isBefore, startOfMinute } from 'date-fns';
-import { SchedulesRepository } from '../repositories/services.repository';
+import { SchedulesRepository } from '../repositories/schedules.repository';
 
 class SchedulesService {
   private schedulesRepository: SchedulesRepository;
@@ -36,7 +36,7 @@ class SchedulesService {
     return create;
   }
 
-  async index(date: Date, user_id: string) {
+  async findEverythingOfTheDay(date: Date, user_id: string) {
     const result = await this.schedulesRepository.findEverythingOfTheDay(
       date,
       user_id
@@ -45,7 +45,7 @@ class SchedulesService {
     return result;
   }
 
-  async indexes(user_id: string) {
+  async findAll(user_id: string) {
     const result = await this.schedulesRepository.findAll(user_id);
 
     return result;
