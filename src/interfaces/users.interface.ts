@@ -6,7 +6,7 @@ export interface ICreate {
 
 export interface IUpdate {
   name: string;
-  oldPassword: string;
+  oldPassword?: string;
   newPassword: string;
   user_id: string;
 }

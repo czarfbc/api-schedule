@@ -5,9 +5,11 @@ import { sign, verify } from 'jsonwebtoken';
 
 class UsersServices {
   private usersRepository: UsersRepository;
+
   constructor() {
     this.usersRepository = new UsersRepository();
   }
+
   async create({ name, email, password }: ICreate) {
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (findUser) {
@@ -23,25 +25,33 @@ class UsersServices {
 
     return create;
   }
-  async update({ oldPassword, newPassword, user_id }: IUpdate) {
-    let password;
+
+  async update({ oldPassword, newPassword, user_id, name }: IUpdate) {
     if (oldPassword && newPassword) {
       const findUserById = await this.usersRepository.findUserById(user_id);
       if (!findUserById) {
         throw new Error('Usuário não encontrado');
       }
 
-      const passwordMatch = compare(oldPassword, findUserById.password);
+      const passwordMatch = await compare(oldPassword, findUserById.password);
       if (!passwordMatch) {
         throw new Error('Senha inválida');
       }
-      password = await hash(newPassword, 10);
 
-      await this.usersRepository.updatePassword(password, user_id);
+      const password = await hash(newPassword, 10);
+
+      await this.usersRepository.update({
+        newPassword: password,
+        user_id,
+        name,
+      });
+
+      return {
+        message: 'Usuário atualizado com sucesso',
+      };
+    } else {
+      throw new Error('Preencha os campos corretamente');
     }
-    return {
-      message: 'Usuário atualizado com sucesso',
-    };
   }
 
   async auth(email: string, password: string) {
