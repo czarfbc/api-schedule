@@ -1,6 +1,6 @@
-import { ICreate } from "../interfaces/schedules.interface";
-import { isBefore, startOfMinute } from "date-fns";
-import { SchedulesRepository } from "../repositories/services.repository";
+import { ICreate } from '../interfaces/schedules.interface';
+import { isBefore, startOfMinute } from 'date-fns';
+import { SchedulesRepository } from '../repositories/services.repository';
 
 class SchedulesService {
   private schedulesRepository: SchedulesRepository;
@@ -13,7 +13,7 @@ class SchedulesService {
     const minuteStart = startOfMinute(dateFormatted);
 
     if (isBefore(minuteStart, new Date())) {
-      throw new Error("Não é permitido agendar data antiga");
+      throw new Error('Não é permitido agendar data antiga');
     }
 
     const checkIsAvailable =
@@ -23,7 +23,7 @@ class SchedulesService {
       );
 
     if (checkIsAvailable) {
-      throw new Error("A data agendada não está disponível");
+      throw new Error('A data agendada não está disponível');
     }
 
     const create = await this.schedulesRepository.create({
@@ -63,7 +63,7 @@ class SchedulesService {
     const minuteStart = startOfMinute(dateFormatted);
 
     if (isBefore(minuteStart, new Date())) {
-      throw new Error("Não é permitido agendar data antiga");
+      throw new Error('Não é permitido agendar data antiga');
     }
 
     const checkIsAvailable =
@@ -73,7 +73,7 @@ class SchedulesService {
       );
 
     if (checkIsAvailable) {
-      throw new Error("A data agendada não está disponível");
+      throw new Error('A data agendada não está disponível');
     }
 
     const result = await this.schedulesRepository.update(

@@ -1,7 +1,7 @@
-import { compare, hash } from "bcrypt";
-import { ICreate, IUpdate } from "../interfaces/users.interface";
-import { UsersRepository } from "../repositories/users.repository";
-import { sign, verify } from "jsonwebtoken";
+import { compare, hash } from 'bcrypt';
+import { ICreate, IUpdate } from '../interfaces/users.interface';
+import { UsersRepository } from '../repositories/users.repository';
+import { sign, verify } from 'jsonwebtoken';
 
 class UsersServices {
   private usersRepository: UsersRepository;
@@ -11,7 +11,7 @@ class UsersServices {
   async create({ name, email, password }: ICreate) {
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (findUser) {
-      throw new Error("Usuário já existe");
+      throw new Error('Usuário já existe');
     }
 
     const hashPassword = await hash(password, 10);
@@ -28,50 +28,50 @@ class UsersServices {
     if (oldPassword && newPassword) {
       const findUserById = await this.usersRepository.findUserById(user_id);
       if (!findUserById) {
-        throw new Error("Usuário não encontrado");
+        throw new Error('Usuário não encontrado');
       }
 
       const passwordMatch = compare(oldPassword, findUserById.password);
       if (!passwordMatch) {
-        throw new Error("Senha inválida");
+        throw new Error('Senha inválida');
       }
       password = await hash(newPassword, 10);
 
       await this.usersRepository.updatePassword(password, user_id);
     }
     return {
-      message: "Usuário atualizado com sucesso",
+      message: 'Usuário atualizado com sucesso',
     };
   }
 
   async auth(email: string, password: string) {
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (!findUser) {
-      throw new Error("Usuário ou senha invalido");
+      throw new Error('Usuário ou senha invalido');
     }
 
     const passwordMatch = await compare(password, findUser.password);
     if (!passwordMatch) {
-      throw new Error("Usuário ou senha invalido");
+      throw new Error('Usuário ou senha invalido');
     }
 
     let secretKey: string | undefined = process.env.ACCESS_KEY_TOKEN;
     if (!secretKey) {
-      throw new Error("Não há chave de token");
+      throw new Error('Não há chave de token');
     }
     let secretKeyRefreshToken: string | undefined =
       process.env.ACCESS_KEY_TOKEN_REFRESH;
     if (!secretKeyRefreshToken) {
-      throw new Error("Não há chave de token");
+      throw new Error('Não há chave de token');
     }
 
     const token = sign({ email }, secretKey, {
       subject: findUser.id,
-      expiresIn: "60s",
+      expiresIn: '60s',
     });
     const refreshToken = sign({ email }, secretKeyRefreshToken, {
       subject: findUser.id,
-      expiresIn: "7d",
+      expiresIn: '7d',
     });
 
     return {
@@ -86,17 +86,17 @@ class UsersServices {
 
   async refresh(refresh_token: string) {
     if (!refresh_token) {
-      throw new Error("Refresh token ausente");
+      throw new Error('Refresh token ausente');
     }
     let secretKeyRefreshToken: string | undefined =
       process.env.ACCESS_KEY_TOKEN_REFRESH;
     if (!secretKeyRefreshToken) {
-      throw new Error("Não há chave de refresh token");
+      throw new Error('Não há chave de refresh token');
     }
 
     let secretKey: string | undefined = process.env.ACCESS_KEY_TOKEN;
     if (!secretKey) {
-      throw new Error("Não há chave de refresh token");
+      throw new Error('Não há chave de refresh token');
     }
 
     const verifyRefreshToken = await verify(
@@ -107,10 +107,10 @@ class UsersServices {
     const { sub } = verifyRefreshToken;
 
     const newToken = sign({ sub }, secretKey, {
-      expiresIn: "1h",
+      expiresIn: '1h',
     });
     const refreshToken = sign({ sub }, secretKeyRefreshToken, {
-      expiresIn: "7d",
+      expiresIn: '7d',
     });
     return { token: newToken, refresh_token: refreshToken };
   }
