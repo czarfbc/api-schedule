@@ -135,29 +135,5 @@ class UsersServices {
     });
     return { token: newToken, refresh_token: refreshToken };
   }
-
-  async forgotPassword(email: string) {
-    const findUser = await this.usersRepository.findUserByEmail(email);
-    if (!findUser) {
-      throw new Error('Usuário não encontrado');
-    }
-
-    const randomToken = await randomBytes(20).toString('hex');
-
-    const token = sign({ email }, randomToken, {
-      subject: findUser.id,
-      expiresIn: '1h',
-    });
-
-    const resend = new Resend('re_Y7MRdSEb_9NS2cecFqRNsLhZeEpsGphQi');
-    const emailData = await resend.emails.send({
-      from: 'ScheduleSystem <onboarding@resend.dev>',
-      to: email,
-      subject: 'Bem vindo!!!',
-      html: `<p>Utilize o seguinte codigo para atualizar a senha  <strong>${token}</strong></p>`,
-    });
-
-    return { token, emailData };
-  }
 }
 export { UsersServices };

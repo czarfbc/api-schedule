@@ -54,20 +54,5 @@ class UsersController {
       next(error);
     }
   }
-
-  async forgotPassword(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) {
-    const { email } = request.body;
-    try {
-      const result = await this.usersServices.forgotPassword(email);
-
-      return response.status(200).json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
 }
 export { UsersController };
