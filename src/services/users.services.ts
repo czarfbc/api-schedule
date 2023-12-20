@@ -2,14 +2,15 @@ import { compare, hash } from 'bcrypt';
 import { ICreate, IUpdate } from '../interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
 import { sign, verify } from 'jsonwebtoken';
-import { randomBytes } from 'crypto';
-import { Resend } from 'resend';
+import { Email } from '../utils/email';
 
 class UsersServices {
   private usersRepository: UsersRepository;
+  private email: Email;
 
   constructor() {
     this.usersRepository = new UsersRepository();
+    this.email = new Email();
   }
 
   async create({ name, email, password }: ICreate) {
@@ -18,12 +19,10 @@ class UsersServices {
       throw new Error('Usuário já existe');
     }
 
-    const resend = new Resend('re_Y7MRdSEb_9NS2cecFqRNsLhZeEpsGphQi');
-    const emailData = await resend.emails.send({
-      from: 'ScheduleSystem <onboarding@resend.dev>',
-      to: email,
-      subject: 'Bem vindo!!!',
-      html: `<h1>Olá ${name}, seja bem vindo ao nosso sistema</h1>`,
+    const emailData = await this.email.sendEmail({
+      inviteTo: email,
+      subject: 'Bem Vindo!!!',
+      html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
     });
 
     const hashPassword = await hash(password, 10);
