@@ -22,6 +22,7 @@ export class App {
     const userRouters = new UserRoutes();
     const userBaseRoute = '/user';
     this.app.use(userBaseRoute, userRouters.postRoutes());
+    this.app.use(userBaseRoute, userRouters.patchRoutes());
 
     const schedulesRoutes = new SchedulesRoutes();
     const scheduleBaseRoute = '/schedules';

@@ -6,7 +6,7 @@ const corsConfig = {
   optionsSuccessStatus: 204,
 };
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3003;
 
 const app = new App(corsConfig);
 

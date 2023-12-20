@@ -18,12 +18,6 @@ class UserRoutes {
       this.usersController.create.bind(this.usersController)
     );
 
-    this.router.patch(
-      '/update',
-      this.authMiddleware.auth.bind(this.authMiddleware),
-      this.usersController.update.bind(this.usersController)
-    );
-
     this.router.post(
       '/auth',
       this.usersController.auth.bind(this.usersController)
@@ -32,6 +26,21 @@ class UserRoutes {
     this.router.post(
       '/refresh',
       this.usersController.refresh.bind(this.usersController)
+    );
+
+    this.router.post(
+      '/forgot-password',
+      this.usersController.forgotPassword.bind(this.usersController)
+    );
+
+    return this.router;
+  }
+
+  patchRoutes() {
+    this.router.patch(
+      '/update',
+      this.authMiddleware.auth.bind(this.authMiddleware),
+      this.usersController.update.bind(this.usersController)
     );
 
     return this.router;

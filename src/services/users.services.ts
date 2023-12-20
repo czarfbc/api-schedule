@@ -2,6 +2,8 @@ import { compare, hash } from 'bcrypt';
 import { ICreate, IUpdate } from '../interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
 import { sign, verify } from 'jsonwebtoken';
+import { randomBytes } from 'crypto';
+import { Resend } from 'resend';
 
 class UsersServices {
   private usersRepository: UsersRepository;
@@ -16,6 +18,14 @@ class UsersServices {
       throw new Error('Usuário já existe');
     }
 
+    const resend = new Resend('re_Y7MRdSEb_9NS2cecFqRNsLhZeEpsGphQi');
+    const emailData = await resend.emails.send({
+      from: 'ScheduleSystem <onboarding@resend.dev>',
+      to: email,
+      subject: 'Bem vindo!!!',
+      html: `<h1>Olá ${name}, seja bem vindo ao nosso sistema</h1>`,
+    });
+
     const hashPassword = await hash(password, 10);
     const create = await this.usersRepository.create({
       name,
@@ -23,7 +33,7 @@ class UsersServices {
       password: hashPassword,
     });
 
-    return create;
+    return { create, emailData };
   }
 
   async update({ oldPassword, newPassword, user_id, name }: IUpdate) {
@@ -40,13 +50,14 @@ class UsersServices {
 
       const password = await hash(newPassword, 10);
 
-      await this.usersRepository.update({
+      const result = await this.usersRepository.update({
         newPassword: password,
         user_id,
         name,
       });
 
       return {
+        result,
         message: 'Usuário atualizado com sucesso',
       };
     } else {
@@ -123,6 +134,30 @@ class UsersServices {
       expiresIn: '7d',
     });
     return { token: newToken, refresh_token: refreshToken };
+  }
+
+  async forgotPassword(email: string) {
+    const findUser = await this.usersRepository.findUserByEmail(email);
+    if (!findUser) {
+      throw new Error('Usuário não encontrado');
+    }
+
+    const randomToken = await randomBytes(20).toString('hex');
+
+    const token = sign({ email }, randomToken, {
+      subject: findUser.id,
+      expiresIn: '1h',
+    });
+
+    const resend = new Resend('re_Y7MRdSEb_9NS2cecFqRNsLhZeEpsGphQi');
+    const emailData = await resend.emails.send({
+      from: 'ScheduleSystem <onboarding@resend.dev>',
+      to: email,
+      subject: 'Bem vindo!!!',
+      html: `<p>Utilize o seguinte codigo para atualizar a senha  <strong>${token}</strong></p>`,
+    });
+
+    return { token, emailData };
   }
 }
 export { UsersServices };

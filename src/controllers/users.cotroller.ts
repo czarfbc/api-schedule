@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import { UsersServices } from '../services/users.services';
-import { Resend } from 'resend';
 
 class UsersController {
   private usersServices: UsersServices;
@@ -11,17 +10,9 @@ class UsersController {
   async create(request: Request, response: Response, next: NextFunction) {
     const { name, email, password } = request.body;
     try {
-      const resend = new Resend('re_Y7MRdSEb_9NS2cecFqRNsLhZeEpsGphQi');
-
       const result = await this.usersServices.create({ name, email, password });
-      const data = await resend.emails.send({
-        from: 'ScheduleSystem <onboarding@resend.dev>',
-        to: email,
-        subject: 'Bem vindo!!!',
-        html: `<h1>Olá ${name}, seja bem vindo ao nosso sistema</h1>`,
-      });
 
-      return response.status(201).json({ result, data });
+      return response.status(201).json({ result });
     } catch (error) {
       next(error);
     }
@@ -58,6 +49,21 @@ class UsersController {
         newPassword,
         user_id,
       });
+      return response.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async forgotPassword(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    const { email } = request.body;
+    try {
+      const result = await this.usersServices.forgotPassword(email);
+
       return response.status(200).json(result);
     } catch (error) {
       next(error);
