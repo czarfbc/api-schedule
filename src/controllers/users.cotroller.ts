@@ -54,5 +54,34 @@ class UsersController {
       next(error);
     }
   }
+
+  async emailToRedefinePassword(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    const { email } = request.body;
+
+    try {
+      const result = await this.usersServices.emailToRedefinePassword(email);
+
+      return response.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async redefinePassword(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    const { token, redefinedPassword } = request.body;
+
+    try {
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 export { UsersController };

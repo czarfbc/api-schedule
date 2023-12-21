@@ -119,10 +119,7 @@ class UsersServices {
       throw new Error('Não há chave de refresh token');
     }
 
-    const verifyRefreshToken = await verify(
-      refresh_token,
-      secretKeyRefreshToken
-    );
+    const verifyRefreshToken = verify(refresh_token, secretKeyRefreshToken);
 
     const { sub } = verifyRefreshToken;
 
@@ -133,6 +130,43 @@ class UsersServices {
       expiresIn: '7d',
     });
     return { token: newToken, refresh_token: refreshToken };
+  }
+
+  async emailToRedefinePassword(email: string) {
+    const findUser = await this.usersRepository.findUserByEmail(email);
+    if (!findUser) {
+      throw new Error('Usuário não encontrado');
+    }
+
+    let secretKey: string | undefined = process.env.ACCESS_KEY_TOKEN;
+    if (!secretKey) {
+      throw new Error('Não há chave de token');
+    }
+
+    const token = sign({ email }, secretKey, {
+      subject: findUser.id,
+      expiresIn: '1h',
+    });
+
+    const emailData = await this.email.sendEmail({
+      inviteTo: email,
+      subject: 'Redefinição de Senha',
+      html: `<p>Utilize o seguinte codigo para conseguir redefinir a senha código: <strong>${token}</strong></p>`,
+    });
+
+    return { emailData };
+  }
+
+  async redefinePassword(
+    token: string,
+    redefinedPassword: string,
+    user_id: string
+  ) {
+    const password = await hash(redefinedPassword, 10);
+    const result = await this.usersRepository.redefinePassword({
+      redefinedPassword: password,
+      user_id,
+    });
   }
 }
 export { UsersServices };

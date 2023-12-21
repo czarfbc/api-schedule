@@ -1,5 +1,9 @@
 import { prisma } from '../database/prisma';
-import { ICreate, IUpdate } from '../interfaces/users.interface';
+import {
+  ICreate,
+  IRedefinePassword,
+  IUpdate,
+} from '../interfaces/users.interface';
 
 class UsersRepository {
   async create({ name, email, password }: ICreate) {
@@ -39,6 +43,18 @@ class UsersRepository {
       data: {
         password: newPassword,
         name,
+      },
+    });
+    return result;
+  }
+
+  async redefinePassword({ redefinedPassword, user_id }: IRedefinePassword) {
+    const result = await prisma.users.update({
+      where: {
+        id: user_id,
+      },
+      data: {
+        password: redefinedPassword,
       },
     });
     return result;
