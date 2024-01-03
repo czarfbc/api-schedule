@@ -1,11 +1,11 @@
-import { endOfDay, startOfDay } from "date-fns";
-import { utcToZonedTime } from "date-fns-tz";
-import { prisma } from "../database/prisma";
-import { ICreate } from "../interfaces/schedules.interface";
+import { endOfDay, startOfDay } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
+import { prisma } from '../database/prisma';
+import { ICreate } from '../interfaces/schedules.interface';
 
 class SchedulesRepository {
   async create({ name, phone, date, user_id, description }: ICreate) {
-    const timeZone = "America/Sao_Paulo";
+    const timeZone = 'America/Sao_Paulo';
     const dateInGmtMinus3 = utcToZonedTime(date, timeZone);
 
     const result = await prisma.schedule.create({
@@ -26,7 +26,7 @@ class SchedulesRepository {
         user_id,
       },
       orderBy: {
-        date: "asc",
+        date: 'asc',
       },
     });
     return result;
@@ -77,7 +77,7 @@ class SchedulesRepository {
         user_id,
       },
       orderBy: {
-        date: "asc",
+        date: 'asc',
       },
     });
     return result;
