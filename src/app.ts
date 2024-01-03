@@ -6,13 +6,13 @@ import cors, { CorsOptions } from 'cors';
 export class App {
   private app: Application;
 
-  constructor(corsConfig?: CorsOptions) {
+  constructor(corsConfig: CorsOptions) {
     this.app = express();
     this.middleware(corsConfig);
     this.setupRoutes();
   }
 
-  private middleware(corsConfig?: CorsOptions) {
+  private middleware(corsConfig: CorsOptions) {
     this.app.use(express.json());
     this.app.use(cors(corsConfig));
     this.app.use(express.urlencoded({ extended: true }));
@@ -22,6 +22,7 @@ export class App {
     const userRouters = new UserRoutes();
     const userBaseRoute = '/user';
     this.app.use(userBaseRoute, userRouters.postRoutes());
+    this.app.use(userBaseRoute, userRouters.patchRoutes());
 
     const schedulesRoutes = new SchedulesRoutes();
     const scheduleBaseRoute = '/schedules';
@@ -31,7 +32,7 @@ export class App {
     this.app.use(scheduleBaseRoute, schedulesRoutes.deleteRoutes());
   }
 
-  listen(port: number) {
+  public listen(port: number) {
     this.app.listen(port, () => {
       console.log(`Servidor rodando na porta ${port}`);
     });

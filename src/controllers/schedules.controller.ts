@@ -7,7 +7,7 @@ class SchedulesController {
   constructor() {
     this.schedulesService = new SchedulesService();
   }
-  async store(request: Request, response: Response, next: NextFunction) {
+  async create(request: Request, response: Response, next: NextFunction) {
     const { name, phone, date, description } = request.body;
     const { user_id } = request;
     try {
@@ -25,12 +25,19 @@ class SchedulesController {
     }
   }
 
-  async index(request: Request, response: Response, next: NextFunction) {
+  async findEverythingOfTheDay(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
     const { date } = request.query;
     const { user_id } = request;
     const parseDate = date ? parseISO(date.toString()) : new Date();
     try {
-      const result = await this.schedulesService.index(parseDate, user_id);
+      const result = await this.schedulesService.findEverythingOfTheDay(
+        parseDate,
+        user_id
+      );
 
       return response.json(result);
     } catch (error) {
@@ -38,10 +45,10 @@ class SchedulesController {
     }
   }
 
-  async indexes(request: Request, response: Response, next: NextFunction) {
+  async findAll(request: Request, response: Response, next: NextFunction) {
     const { user_id } = request;
     try {
-      const result = await this.schedulesService.indexes(user_id);
+      const result = await this.schedulesService.findAll(user_id);
 
       return response.json(result);
     } catch (error) {

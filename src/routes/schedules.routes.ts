@@ -17,7 +17,7 @@ class SchedulesRoutes {
     this.router.post(
       '/create',
       this.authMiddleware.auth.bind(this.authMiddleware),
-      this.schedulesController.store.bind(this.schedulesController)
+      this.schedulesController.create.bind(this.schedulesController)
     );
 
     return this.router;
@@ -27,13 +27,17 @@ class SchedulesRoutes {
     this.router.get(
       '/getofday',
       this.authMiddleware.auth.bind(this.authMiddleware),
-      this.schedulesController.index.bind(this.schedulesController)
+      this.schedulesController.findEverythingOfTheDay.bind(
+        this.schedulesController
+      )
     );
 
     this.router.get(
       '/getall',
       this.authMiddleware.auth.bind(this.authMiddleware),
-      this.schedulesController.indexes.bind(this.schedulesController)
+      this.schedulesController.findEverythingOfTheDay.bind(
+        this.schedulesController
+      )
     );
 
     return this.router;

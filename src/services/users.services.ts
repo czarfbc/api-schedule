@@ -2,17 +2,28 @@ import { compare, hash } from 'bcrypt';
 import { ICreate, IUpdate } from '../interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
 import { sign, verify } from 'jsonwebtoken';
+import { Email } from '../utils/email';
 
 class UsersServices {
   private usersRepository: UsersRepository;
+  private email: Email;
+
   constructor() {
     this.usersRepository = new UsersRepository();
+    this.email = new Email();
   }
+
   async create({ name, email, password }: ICreate) {
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (findUser) {
       throw new Error('Usuário já existe');
     }
+
+    const emailData = await this.email.sendEmail({
+      inviteTo: email,
+      subject: 'Bem Vindo!!!',
+      html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
+    });
 
     const hashPassword = await hash(password, 10);
     const create = await this.usersRepository.create({
@@ -21,27 +32,36 @@ class UsersServices {
       password: hashPassword,
     });
 
-    return create;
+    return { create, emailData };
   }
-  async update({ oldPassword, newPassword, user_id }: IUpdate) {
-    let password;
+
+  async update({ oldPassword, newPassword, user_id, name }: IUpdate) {
     if (oldPassword && newPassword) {
       const findUserById = await this.usersRepository.findUserById(user_id);
       if (!findUserById) {
         throw new Error('Usuário não encontrado');
       }
 
-      const passwordMatch = compare(oldPassword, findUserById.password);
+      const passwordMatch = await compare(oldPassword, findUserById.password);
       if (!passwordMatch) {
         throw new Error('Senha inválida');
       }
-      password = await hash(newPassword, 10);
 
-      await this.usersRepository.updatePassword(password, user_id);
+      const password = await hash(newPassword, 10);
+
+      const result = await this.usersRepository.update({
+        newPassword: password,
+        user_id,
+        name,
+      });
+
+      return {
+        result,
+        message: 'Usuário atualizado com sucesso',
+      };
+    } else {
+      throw new Error('Preencha os campos corretamente');
     }
-    return {
-      message: 'Usuário atualizado com sucesso',
-    };
   }
 
   async auth(email: string, password: string) {
@@ -99,10 +119,7 @@ class UsersServices {
       throw new Error('Não há chave de refresh token');
     }
 
-    const verifyRefreshToken = await verify(
-      refresh_token,
-      secretKeyRefreshToken
-    );
+    const verifyRefreshToken = verify(refresh_token, secretKeyRefreshToken);
 
     const { sub } = verifyRefreshToken;
 

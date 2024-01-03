@@ -15,14 +15,7 @@ class UserRoutes {
   postRoutes() {
     this.router.post(
       '/create',
-      this.usersController.store.bind(this.usersController)
-    );
-
-    this.router.put(
-      '/update',
-
-      this.authMiddleware.auth.bind(this.authMiddleware),
-      this.usersController.update.bind(this.usersController)
+      this.usersController.create.bind(this.usersController)
     );
 
     this.router.post(
@@ -33,6 +26,16 @@ class UserRoutes {
     this.router.post(
       '/refresh',
       this.usersController.refresh.bind(this.usersController)
+    );
+
+    return this.router;
+  }
+
+  patchRoutes() {
+    this.router.patch(
+      '/update',
+      this.authMiddleware.auth.bind(this.authMiddleware),
+      this.usersController.update.bind(this.usersController)
     );
 
     return this.router;

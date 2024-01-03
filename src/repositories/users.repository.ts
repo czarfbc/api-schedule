@@ -1,5 +1,5 @@
 import { prisma } from '../database/prisma';
-import { ICreate } from '../interfaces/users.interface';
+import { ICreate, IUpdate } from '../interfaces/users.interface';
 
 class UsersRepository {
   async create({ name, email, password }: ICreate) {
@@ -12,6 +12,7 @@ class UsersRepository {
     });
     return result;
   }
+
   async findUserByEmail(email: string) {
     const result = await prisma.users.findUnique({
       where: {
@@ -20,6 +21,7 @@ class UsersRepository {
     });
     return result;
   }
+
   async findUserById(id: string) {
     const result = await prisma.users.findUnique({
       where: {
@@ -28,24 +30,15 @@ class UsersRepository {
     });
     return result;
   }
-  async update(name: string, user_id: string) {
-    const result = await prisma.users.update({
-      where: {
-        id: user_id,
-      },
-      data: {
-        name,
-      },
-    });
-    return result;
-  }
-  async updatePassword(newPassword: string, user_id: string) {
+
+  async update({ newPassword, user_id, name }: IUpdate) {
     const result = await prisma.users.update({
       where: {
         id: user_id,
       },
       data: {
         password: newPassword,
+        name,
       },
     });
     return result;
