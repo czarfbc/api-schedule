@@ -11,11 +11,6 @@ export interface IUpdate {
   user_id: string;
 }
 
-export interface IRedefinePassword {
-  redefinedPassword: string;
-  user_id: string;
-}
-
 export interface IPayload {
   sub: string;
 }
