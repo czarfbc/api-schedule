@@ -1,5 +1,9 @@
 import { compare, hash } from 'bcrypt';
-import { ICreateUsers, IUpdateUsers } from '../interfaces/users.interface';
+import {
+  IAuthUsers,
+  ICreateUsers,
+  IUpdateUsers,
+} from '../interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
 import { sign, verify } from 'jsonwebtoken';
 import { EmailUtils } from '../utils/email.utils';
@@ -75,7 +79,7 @@ class UsersServices {
     }
   }
 
-  async auth(email: string, password: string) {
+  async auth({ email, password }: IAuthUsers) {
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (!findUser) {
       throw new Error('Usuário ou senha invalido');

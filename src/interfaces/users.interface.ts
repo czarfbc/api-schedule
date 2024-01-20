@@ -11,6 +11,11 @@ export interface IUpdateUsers {
   user_id: string;
 }
 
+export interface IAuthUsers {
+  email: string;
+  password: string;
+}
+
 export interface IPayload {
   sub: string;
 }
