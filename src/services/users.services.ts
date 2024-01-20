@@ -19,8 +19,6 @@ class UsersServices {
   }
 
   async create({ name, email, password }: ICreateUsers) {
-    const validateInput = createSchemaUsers.parse({ name, email, password });
-
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (findUser) {
       throw new Error('Usuário já existe');
@@ -32,6 +30,7 @@ class UsersServices {
       html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
     });
 
+    const validateInput = createSchemaUsers.parse({ name, email, password });
     const hashPassword = await hash(validateInput.password, 10);
     const create = await this.usersRepository.create({
       name: validateInput.name,
@@ -43,31 +42,24 @@ class UsersServices {
   }
 
   async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
-    const validateInput = updateSchemaUsers.parse({
-      name,
-      oldPassword,
-      newPassword,
-      user_id,
-    });
-
-    if (validateInput.oldPassword && validateInput.newPassword) {
-      const findUserById = await this.usersRepository.findUserById(
-        validateInput.user_id
-      );
+    if (oldPassword && newPassword) {
+      const findUserById = await this.usersRepository.findUserById(user_id);
       if (!findUserById) {
         throw new Error('Usuário não encontrado');
       }
 
-      const passwordMatch = await compare(
-        validateInput.oldPassword,
-        findUserById.password
-      );
+      const passwordMatch = await compare(oldPassword, findUserById.password);
       if (!passwordMatch) {
         throw new Error('Senha inválida');
       }
 
+      const validateInput = updateSchemaUsers.parse({
+        name,
+        oldPassword,
+        newPassword,
+        user_id,
+      });
       const password = await hash(validateInput.newPassword, 10);
-
       const result = await this.usersRepository.update({
         newPassword: password,
         user_id: validateInput.user_id,
