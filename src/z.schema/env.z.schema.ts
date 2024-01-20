@@ -5,7 +5,7 @@ const envSchema = z.object({
   ACCESS_KEY_TOKEN: z.string(),
   ACCESS_KEY_TOKEN_REFRESH: z.string(),
   RESEND_KEY: z.string(),
-  PORT: z.number().int().positive(),
+  PORT: z.string(),
 });
 
 export const env = envSchema.parse(process.env);
