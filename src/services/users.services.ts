@@ -3,6 +3,7 @@ import { ICreate, IUpdate } from '../interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
 import { sign, verify } from 'jsonwebtoken';
 import { Email } from '../utils/email';
+import { env } from '../z.schema/env.z.schema';
 
 class UsersServices {
   private usersRepository: UsersRepository;
@@ -75,12 +76,11 @@ class UsersServices {
       throw new Error('Usuário ou senha invalido');
     }
 
-    let secretKey: string | undefined = process.env.ACCESS_KEY_TOKEN;
+    let secretKey: string = env.ACCESS_KEY_TOKEN;
     if (!secretKey) {
       throw new Error('Não há chave de token');
     }
-    let secretKeyRefreshToken: string | undefined =
-      process.env.ACCESS_KEY_TOKEN_REFRESH;
+    let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
     if (!secretKeyRefreshToken) {
       throw new Error('Não há chave de token');
     }
@@ -108,13 +108,12 @@ class UsersServices {
     if (!refresh_token) {
       throw new Error('Refresh token ausente');
     }
-    let secretKeyRefreshToken: string | undefined =
-      process.env.ACCESS_KEY_TOKEN_REFRESH;
+    let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
     if (!secretKeyRefreshToken) {
       throw new Error('Não há chave de refresh token');
     }
 
-    let secretKey: string | undefined = process.env.ACCESS_KEY_TOKEN;
+    let secretKey: string = env.ACCESS_KEY_TOKEN;
     if (!secretKey) {
       throw new Error('Não há chave de refresh token');
     }
