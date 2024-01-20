@@ -1,13 +1,19 @@
 import { prisma } from '../database/prisma';
-import { ICreate, IUpdate } from '../interfaces/users.interface';
+import { ICreateUsers, IUpdateUsers } from '../interfaces/users.interface';
+import {
+  createSchemaUsers,
+  updateSchemaUsers,
+} from '../z.schema/users.z.schema';
 
 class UsersRepository {
-  async create({ name, email, password }: ICreate) {
+  async create({ name, email, password }: ICreateUsers) {
+    const validateInput = createSchemaUsers.parse({ name, email, password });
+
     const result = await prisma.users.create({
       data: {
-        name,
-        email,
-        password,
+        name: validateInput.name,
+        email: validateInput.email,
+        password: validateInput.password,
       },
     });
     return result;
@@ -31,14 +37,20 @@ class UsersRepository {
     return result;
   }
 
-  async update({ newPassword, user_id, name }: IUpdate) {
+  async update({ newPassword, user_id, name }: IUpdateUsers) {
+    const validateInput = updateSchemaUsers.parse({
+      newPassword,
+      user_id,
+      name,
+    });
+
     const result = await prisma.users.update({
       where: {
-        id: user_id,
+        id: validateInput.user_id,
       },
       data: {
-        password: newPassword,
-        name,
+        password: validateInput.newPassword,
+        name: validateInput.name,
       },
     });
     return result;

@@ -1,59 +1,79 @@
 import { compare, hash } from 'bcrypt';
-import { ICreate, IUpdate } from '../interfaces/users.interface';
+import { ICreateUsers, IUpdateUsers } from '../interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
 import { sign, verify } from 'jsonwebtoken';
-import { Email } from '../utils/email.utils';
+import { EmailUtils } from '../utils/email.utils';
 import { env } from '../z.schema/env.z.schema';
+import {
+  createSchemaUsers,
+  updateSchemaUsers,
+} from '../z.schema/users.z.schema';
 
 class UsersServices {
   private usersRepository: UsersRepository;
-  private email: Email;
+  private email: EmailUtils;
 
   constructor() {
     this.usersRepository = new UsersRepository();
-    this.email = new Email();
+    this.email = new EmailUtils();
   }
 
-  async create({ name, email, password }: ICreate) {
-    const findUser = await this.usersRepository.findUserByEmail(email);
+  async create({ name, email, password }: ICreateUsers) {
+    const validateInput = createSchemaUsers.parse({ name, email, password });
+
+    const findUser = await this.usersRepository.findUserByEmail(
+      validateInput.email
+    );
     if (findUser) {
       throw new Error('Usuário já existe');
     }
 
     const emailData = await this.email.sendEmail({
-      inviteTo: email,
+      inviteTo: validateInput.email,
       subject: 'Bem Vindo!!!',
-      html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
+      html: `"<h1>Olá ${validateInput.name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
     });
 
-    const hashPassword = await hash(password, 10);
+    const hashPassword = await hash(validateInput.password, 10);
     const create = await this.usersRepository.create({
-      name,
-      email,
+      name: validateInput.name,
+      email: validateInput.email,
       password: hashPassword,
     });
 
     return { create, emailData };
   }
 
-  async update({ oldPassword, newPassword, user_id, name }: IUpdate) {
-    if (oldPassword && newPassword) {
-      const findUserById = await this.usersRepository.findUserById(user_id);
+  async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
+    const validateInput = updateSchemaUsers.parse({
+      name,
+      oldPassword,
+      newPassword,
+      user_id,
+    });
+
+    if (validateInput.oldPassword && validateInput.newPassword) {
+      const findUserById = await this.usersRepository.findUserById(
+        validateInput.user_id
+      );
       if (!findUserById) {
         throw new Error('Usuário não encontrado');
       }
 
-      const passwordMatch = await compare(oldPassword, findUserById.password);
+      const passwordMatch = await compare(
+        validateInput.oldPassword,
+        findUserById.password
+      );
       if (!passwordMatch) {
         throw new Error('Senha inválida');
       }
 
-      const password = await hash(newPassword, 10);
+      const password = await hash(validateInput.newPassword, 10);
 
       const result = await this.usersRepository.update({
         newPassword: password,
-        user_id,
-        name,
+        user_id: validateInput.user_id,
+        name: validateInput.name,
       });
 
       return {
