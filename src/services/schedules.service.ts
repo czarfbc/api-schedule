@@ -1,4 +1,8 @@
-import { ICreate } from '../interfaces/schedules.interface';
+import {
+  ICreateSchedules,
+  IFindSchedules,
+  IUpdateSchedule,
+} from '../interfaces/schedules.interface';
 import { isBefore, startOfMinute } from 'date-fns';
 import { SchedulesRepository } from '../repositories/schedules.repository';
 
@@ -7,7 +11,8 @@ class SchedulesService {
   constructor() {
     this.schedulesRepository = new SchedulesRepository();
   }
-  async create({ name, phone, date, user_id, description }: ICreate) {
+
+  async create({ name, phone, date, user_id, description }: ICreateSchedules) {
     const dateFormatted = new Date(date);
 
     const minuteStart = startOfMinute(dateFormatted);
@@ -17,10 +22,10 @@ class SchedulesService {
     }
 
     const checkIsAvailable =
-      await this.schedulesRepository.findIfVerificationIsAvailable(
-        minuteStart,
-        user_id
-      );
+      await this.schedulesRepository.findIfVerificationIsAvailable({
+        date: minuteStart,
+        user_id,
+      });
 
     if (checkIsAvailable) {
       throw new Error('A data agendada não está disponível');
@@ -36,11 +41,11 @@ class SchedulesService {
     return create;
   }
 
-  async findEverythingOfTheDay(date: Date, user_id: string) {
-    const result = await this.schedulesRepository.findEverythingOfTheDay(
+  async findEverythingOfTheDay({ date, user_id }: IFindSchedules) {
+    const result = await this.schedulesRepository.findEverythingOfTheDay({
       date,
-      user_id
-    );
+      user_id,
+    });
 
     return result;
   }
@@ -51,13 +56,7 @@ class SchedulesService {
     return result;
   }
 
-  async update(
-    id: string,
-    date: Date,
-    user_id: string,
-    phone: string,
-    description: string
-  ) {
+  async update({ id, date, user_id, phone, description }: IUpdateSchedule) {
     const dateFormatted = new Date(date);
 
     const minuteStart = startOfMinute(dateFormatted);
@@ -66,22 +65,25 @@ class SchedulesService {
       throw new Error('Não é permitido agendar data antiga');
     }
 
+    if (!user_id) {
+      throw new Error('Usuário não encontrado');
+    }
     const checkIsAvailable =
-      await this.schedulesRepository.findIfVerificationIsAvailable(
-        minuteStart,
-        user_id
-      );
+      await this.schedulesRepository.findIfVerificationIsAvailable({
+        date: minuteStart,
+        user_id,
+      });
 
     if (checkIsAvailable) {
       throw new Error('A data agendada não está disponível');
     }
 
-    const result = await this.schedulesRepository.update(
+    const result = await this.schedulesRepository.update({
       id,
       date,
       phone,
-      description
-    );
+      description,
+    });
     return result;
   }
 

@@ -7,6 +7,7 @@ class SchedulesController {
   constructor() {
     this.schedulesService = new SchedulesService();
   }
+
   async create(request: Request, response: Response, next: NextFunction) {
     const { name, phone, date, description } = request.body;
     const { user_id } = request;
@@ -34,10 +35,10 @@ class SchedulesController {
     const { user_id } = request;
     const parseDate = date ? parseISO(date.toString()) : new Date();
     try {
-      const result = await this.schedulesService.findEverythingOfTheDay(
-        parseDate,
-        user_id
-      );
+      const result = await this.schedulesService.findEverythingOfTheDay({
+        date: parseDate,
+        user_id,
+      });
 
       return response.json(result);
     } catch (error) {
@@ -61,13 +62,13 @@ class SchedulesController {
     const { date, phone, description } = request.body;
     const { user_id } = request;
     try {
-      const result = await this.schedulesService.update(
+      const result = await this.schedulesService.update({
         id,
         date,
         user_id,
         phone,
-        description
-      );
+        description,
+      });
 
       return response.json(result);
     } catch (error) {
