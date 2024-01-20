@@ -25,7 +25,7 @@ class UsersServices {
   async create({ name, email, password }: ICreateUsers) {
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (findUser) {
-      throw new Error('Usuário já existe');
+      throw new Error('User already exists');
     }
 
     const validateInput = createSchemaUsers.parse({ name, email, password });
@@ -49,12 +49,12 @@ class UsersServices {
     if (oldPassword && newPassword) {
       const findUserById = await this.usersRepository.findUserById(user_id);
       if (!findUserById) {
-        throw new Error('Usuário não encontrado');
+        throw new Error('User not found');
       }
 
       const passwordMatch = await compare(oldPassword, findUserById.password);
       if (!passwordMatch) {
-        throw new Error('Senha inválida');
+        throw new Error('nvalid password');
       }
 
       const validateInput = updateSchemaUsers.parse({
@@ -72,31 +72,31 @@ class UsersServices {
 
       return {
         result,
-        message: 'Usuário atualizado com sucesso',
+        message: 'User updated successfully',
       };
     } else {
-      throw new Error('Preencha os campos corretamente');
+      throw new Error('Fill in the fields correctly');
     }
   }
 
   async auth({ email, password }: IAuthUsers) {
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (!findUser) {
-      throw new Error('Usuário ou senha invalido');
+      throw new Error('Invalid email or password');
     }
 
     const passwordMatch = await compare(password, findUser.password);
     if (!passwordMatch) {
-      throw new Error('Usuário ou senha invalido');
+      throw new Error('Invalid email or password');
     }
 
     let secretKey: string = env.ACCESS_KEY_TOKEN;
     if (!secretKey) {
-      throw new Error('Não há chave de token');
+      throw new Error('There is no token key');
     }
     let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
     if (!secretKeyRefreshToken) {
-      throw new Error('Não há chave de token');
+      throw new Error('There is no token key');
     }
 
     const token = sign({ email }, secretKey, {
@@ -120,16 +120,16 @@ class UsersServices {
 
   async refresh(refresh_token: string) {
     if (!refresh_token) {
-      throw new Error('Refresh token ausente');
+      throw new Error('Refresh token missing');
     }
     let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
     if (!secretKeyRefreshToken) {
-      throw new Error('Não há chave de refresh token');
+      throw new Error('There is no refresh token key');
     }
 
     let secretKey: string = env.ACCESS_KEY_TOKEN;
     if (!secretKey) {
-      throw new Error('Não há chave de refresh token');
+      throw new Error('There is no token key');
     }
 
     const verifyRefreshToken = verify(refresh_token, secretKeyRefreshToken);
