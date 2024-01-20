@@ -28,18 +28,18 @@ class UsersServices {
       throw new Error('Usuário já existe');
     }
 
-    const emailData = await this.email.sendEmail({
-      inviteTo: email,
-      subject: 'Bem Vindo!!!',
-      html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
-    });
-
     const validateInput = createSchemaUsers.parse({ name, email, password });
     const hashPassword = await hash(validateInput.password, 10);
     const create = await this.usersRepository.create({
       name: validateInput.name,
       email: validateInput.email,
       password: hashPassword,
+    });
+
+    const emailData = await this.email.sendEmail({
+      inviteTo: email,
+      subject: 'Bem Vindo!!!',
+      html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
     });
 
     return { create, emailData };
