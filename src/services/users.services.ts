@@ -2,7 +2,7 @@ import { compare, hash } from 'bcrypt';
 import { ICreate, IUpdate } from '../interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
 import { sign, verify } from 'jsonwebtoken';
-import { Email } from '../utils/email';
+import { Email } from '../utils/email.utils';
 import { env } from '../z.schema/env.z.schema';
 
 class UsersServices {
