@@ -5,6 +5,10 @@ import {
 } from '../interfaces/schedules.interface';
 import { isBefore, startOfMinute } from 'date-fns';
 import { SchedulesRepository } from '../repositories/schedules.repository';
+import {
+  createSchemaSchedules,
+  updateSchemaSchedule,
+} from '../z.schema/schedules.z.schema';
 
 class SchedulesService {
   private schedulesRepository: SchedulesRepository;
@@ -13,8 +17,15 @@ class SchedulesService {
   }
 
   async create({ name, phone, date, user_id, description }: ICreateSchedules) {
-    const dateFormatted = new Date(date);
+    const validateInput = createSchemaSchedules.parse({
+      name,
+      phone,
+      date,
+      user_id,
+      description,
+    });
 
+    const dateFormatted = new Date(validateInput.date);
     const minuteStart = startOfMinute(dateFormatted);
 
     if (isBefore(minuteStart, new Date())) {
@@ -24,7 +35,7 @@ class SchedulesService {
     const checkIsAvailable =
       await this.schedulesRepository.findIfVerificationIsAvailable({
         date: minuteStart,
-        user_id,
+        user_id: validateInput.user_id,
       });
 
     if (checkIsAvailable) {
@@ -32,11 +43,11 @@ class SchedulesService {
     }
 
     const create = await this.schedulesRepository.create({
-      name,
-      phone,
+      name: validateInput.name,
+      phone: validateInput.phone,
       date: minuteStart,
-      user_id,
-      description,
+      user_id: validateInput.user_id,
+      description: validateInput.description,
     });
     return create;
   }
@@ -57,8 +68,15 @@ class SchedulesService {
   }
 
   async update({ id, date, user_id, phone, description }: IUpdateSchedule) {
-    const dateFormatted = new Date(date);
+    const validateInput = updateSchemaSchedule.parse({
+      id,
+      date,
+      phone,
+      description,
+      user_id,
+    });
 
+    const dateFormatted = new Date(validateInput.date);
     const minuteStart = startOfMinute(dateFormatted);
 
     if (isBefore(minuteStart, new Date())) {
@@ -71,7 +89,7 @@ class SchedulesService {
     const checkIsAvailable =
       await this.schedulesRepository.findIfVerificationIsAvailable({
         date: minuteStart,
-        user_id,
+        user_id: validateInput.user_id,
       });
 
     if (checkIsAvailable) {
@@ -79,10 +97,10 @@ class SchedulesService {
     }
 
     const result = await this.schedulesRepository.update({
-      id,
-      date,
-      phone,
-      description,
+      id: validateInput.id,
+      date: validateInput.date,
+      phone: validateInput.phone,
+      description: validateInput.description,
     });
     return result;
   }

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { SchedulesService } from '../services/schedules.service';
 import { parseISO } from 'date-fns';
+import { ZodError } from 'zod';
 
 class SchedulesController {
   private schedulesService: SchedulesService;
@@ -22,6 +23,10 @@ class SchedulesController {
 
       return response.status(201).json(result);
     } catch (error) {
+      if (error instanceof ZodError) {
+        const validationErrors = error.errors.map((err) => err.message);
+        return response.status(400).json({ errors: validationErrors });
+      }
       next(error);
     }
   }
@@ -72,6 +77,10 @@ class SchedulesController {
 
       return response.json(result);
     } catch (error) {
+      if (error instanceof ZodError) {
+        const validationErrors = error.errors.map((err) => err.message);
+        return response.status(400).json({ errors: validationErrors });
+      }
       next(error);
     }
   }

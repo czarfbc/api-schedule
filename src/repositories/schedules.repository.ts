@@ -6,19 +6,31 @@ import {
   IFindSchedules,
   IUpdateSchedule,
 } from '../interfaces/schedules.interface';
+import {
+  createSchemaSchedules,
+  updateSchemaSchedule,
+} from '../z.schema/schedules.z.schema';
 
 class SchedulesRepository {
   async create({ name, phone, date, user_id, description }: ICreateSchedules) {
+    const validateInput = createSchemaSchedules.parse({
+      name,
+      phone,
+      date,
+      user_id,
+      description,
+    });
+
     const timeZone = 'America/Sao_Paulo';
-    const dateInGmtMinus3 = utcToZonedTime(date, timeZone);
+    const dateInGmtMinus3 = utcToZonedTime(validateInput.date, timeZone);
 
     const result = await prisma.schedule.create({
       data: {
-        name,
-        phone,
+        name: validateInput.name,
+        phone: validateInput.phone,
         date: dateInGmtMinus3,
-        user_id,
-        description,
+        user_id: validateInput.user_id,
+        description: validateInput.description,
       },
     });
     return result;
@@ -88,14 +100,20 @@ class SchedulesRepository {
   }
 
   async update({ id, date, phone, description }: IUpdateSchedule) {
+    const validateInput = updateSchemaSchedule.parse({
+      id,
+      date,
+      phone,
+      description,
+    });
     const result = await prisma.schedule.update({
       where: {
-        id,
+        id: validateInput.id,
       },
       data: {
-        date,
-        phone,
-        description,
+        date: validateInput.date,
+        phone: validateInput.phone,
+        description: validateInput.description,
       },
     });
     return result;
