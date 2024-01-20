@@ -21,17 +21,15 @@ class UsersServices {
   async create({ name, email, password }: ICreateUsers) {
     const validateInput = createSchemaUsers.parse({ name, email, password });
 
-    const findUser = await this.usersRepository.findUserByEmail(
-      validateInput.email
-    );
+    const findUser = await this.usersRepository.findUserByEmail(email);
     if (findUser) {
       throw new Error('Usuário já existe');
     }
 
     const emailData = await this.email.sendEmail({
-      inviteTo: validateInput.email,
+      inviteTo: email,
       subject: 'Bem Vindo!!!',
-      html: `"<h1>Olá ${validateInput.name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
+      html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
     });
 
     const hashPassword = await hash(validateInput.password, 10);
