@@ -1,4 +1,5 @@
 import { App } from './app';
+import { env } from './z.schema/env.z.schema';
 
 const corsConfig = {
   origin: 'http://localhost:3003',
@@ -6,7 +7,7 @@ const corsConfig = {
   optionsSuccessStatus: 204,
 };
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3003;
+const PORT = env.PORT;
 
 const app = new App(corsConfig);
 

@@ -1,12 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import { SchedulesService } from '../services/schedules.service';
 import { parseISO } from 'date-fns';
+import { ZodError } from 'zod';
 
 class SchedulesController {
   private schedulesService: SchedulesService;
   constructor() {
     this.schedulesService = new SchedulesService();
   }
+
   async create(request: Request, response: Response, next: NextFunction) {
     const { name, phone, date, description } = request.body;
     const { user_id } = request;
@@ -21,6 +23,10 @@ class SchedulesController {
 
       return response.status(201).json(result);
     } catch (error) {
+      if (error instanceof ZodError) {
+        const validationErrors = error.errors.map((err) => err.message);
+        return response.status(400).json({ errors: validationErrors });
+      }
       next(error);
     }
   }
@@ -34,10 +40,10 @@ class SchedulesController {
     const { user_id } = request;
     const parseDate = date ? parseISO(date.toString()) : new Date();
     try {
-      const result = await this.schedulesService.findEverythingOfTheDay(
-        parseDate,
-        user_id
-      );
+      const result = await this.schedulesService.findEverythingOfTheDay({
+        date: parseDate,
+        user_id,
+      });
 
       return response.json(result);
     } catch (error) {
@@ -61,16 +67,20 @@ class SchedulesController {
     const { date, phone, description } = request.body;
     const { user_id } = request;
     try {
-      const result = await this.schedulesService.update(
+      const result = await this.schedulesService.update({
         id,
         date,
         user_id,
         phone,
-        description
-      );
+        description,
+      });
 
       return response.json(result);
     } catch (error) {
+      if (error instanceof ZodError) {
+        const validationErrors = error.errors.map((err) => err.message);
+        return response.status(400).json({ errors: validationErrors });
+      }
       next(error);
     }
   }

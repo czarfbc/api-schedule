@@ -1,14 +1,19 @@
-export interface ICreate {
+export interface ICreateUsers {
   name: string;
   email: string;
   password: string;
 }
 
-export interface IUpdate {
+export interface IUpdateUsers {
   name: string;
   oldPassword?: string;
   newPassword: string;
   user_id: string;
+}
+
+export interface IAuthUsers {
+  email: string;
+  password: string;
 }
 
 export interface IPayload {

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { SchedulesController } from '../controllers/schedules.controller';
-import { AuthMiddleware } from '../middlewares/auth';
+import { AuthMiddleware } from '../middlewares/auth.middlewares';
 
 class SchedulesRoutes {
   private router: Router;

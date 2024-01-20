@@ -1,20 +1,36 @@
 import { endOfDay, startOfDay } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
 import { prisma } from '../database/prisma';
-import { ICreate } from '../interfaces/schedules.interface';
+import {
+  ICreateSchedules,
+  IFindSchedules,
+  IUpdateSchedule,
+} from '../interfaces/schedules.interface';
+import {
+  createSchemaSchedules,
+  updateSchemaSchedule,
+} from '../z.schema/schedules.z.schema';
 
 class SchedulesRepository {
-  async create({ name, phone, date, user_id, description }: ICreate) {
+  async create({ name, phone, date, user_id, description }: ICreateSchedules) {
+    const validateInput = createSchemaSchedules.parse({
+      name,
+      phone,
+      date,
+      user_id,
+      description,
+    });
+
     const timeZone = 'America/Sao_Paulo';
-    const dateInGmtMinus3 = utcToZonedTime(date, timeZone);
+    const dateInGmtMinus3 = utcToZonedTime(validateInput.date, timeZone);
 
     const result = await prisma.schedule.create({
       data: {
-        name,
-        phone,
+        name: validateInput.name,
+        phone: validateInput.phone,
         date: dateInGmtMinus3,
-        user_id,
-        description,
+        user_id: validateInput.user_id,
+        description: validateInput.description,
       },
     });
     return result;
@@ -50,7 +66,7 @@ class SchedulesRepository {
     return filteredData;
   }
 
-  async findIfVerificationIsAvailable(date: Date, user_id: string) {
+  async findIfVerificationIsAvailable({ date, user_id }: IFindSchedules) {
     const result = await prisma.schedule.findFirst({
       where: {
         date,
@@ -67,7 +83,7 @@ class SchedulesRepository {
     return result;
   }
 
-  async findEverythingOfTheDay(date: Date, user_id: string) {
+  async findEverythingOfTheDay({ date, user_id }: IFindSchedules) {
     const result = await prisma.schedule.findMany({
       where: {
         date: {
@@ -83,15 +99,21 @@ class SchedulesRepository {
     return result;
   }
 
-  async update(id: string, date: Date, phone: string, description: string) {
+  async update({ id, date, phone, description }: IUpdateSchedule) {
+    const validateInput = updateSchemaSchedule.parse({
+      id,
+      date,
+      phone,
+      description,
+    });
     const result = await prisma.schedule.update({
       where: {
-        id,
+        id: validateInput.id,
       },
       data: {
-        date,
-        phone,
-        description,
+        date: validateInput.date,
+        phone: validateInput.phone,
+        description: validateInput.description,
       },
     });
     return result;

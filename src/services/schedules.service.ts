@@ -1,15 +1,31 @@
-import { ICreate } from '../interfaces/schedules.interface';
+import {
+  ICreateSchedules,
+  IFindSchedules,
+  IUpdateSchedule,
+} from '../interfaces/schedules.interface';
 import { isBefore, startOfMinute } from 'date-fns';
 import { SchedulesRepository } from '../repositories/schedules.repository';
+import {
+  createSchemaSchedules,
+  updateSchemaSchedule,
+} from '../z.schema/schedules.z.schema';
 
 class SchedulesService {
   private schedulesRepository: SchedulesRepository;
   constructor() {
     this.schedulesRepository = new SchedulesRepository();
   }
-  async create({ name, phone, date, user_id, description }: ICreate) {
-    const dateFormatted = new Date(date);
 
+  async create({ name, phone, date, user_id, description }: ICreateSchedules) {
+    const validateInput = createSchemaSchedules.parse({
+      name,
+      phone,
+      date,
+      user_id,
+      description,
+    });
+
+    const dateFormatted = new Date(validateInput.date);
     const minuteStart = startOfMinute(dateFormatted);
 
     if (isBefore(minuteStart, new Date())) {
@@ -17,30 +33,30 @@ class SchedulesService {
     }
 
     const checkIsAvailable =
-      await this.schedulesRepository.findIfVerificationIsAvailable(
-        minuteStart,
-        user_id
-      );
+      await this.schedulesRepository.findIfVerificationIsAvailable({
+        date: minuteStart,
+        user_id: validateInput.user_id,
+      });
 
     if (checkIsAvailable) {
       throw new Error('A data agendada não está disponível');
     }
 
     const create = await this.schedulesRepository.create({
-      name,
-      phone,
+      name: validateInput.name,
+      phone: validateInput.phone,
       date: minuteStart,
-      user_id,
-      description,
+      user_id: validateInput.user_id,
+      description: validateInput.description,
     });
     return create;
   }
 
-  async findEverythingOfTheDay(date: Date, user_id: string) {
-    const result = await this.schedulesRepository.findEverythingOfTheDay(
+  async findEverythingOfTheDay({ date, user_id }: IFindSchedules) {
+    const result = await this.schedulesRepository.findEverythingOfTheDay({
       date,
-      user_id
-    );
+      user_id,
+    });
 
     return result;
   }
@@ -51,37 +67,41 @@ class SchedulesService {
     return result;
   }
 
-  async update(
-    id: string,
-    date: Date,
-    user_id: string,
-    phone: string,
-    description: string
-  ) {
-    const dateFormatted = new Date(date);
+  async update({ id, date, user_id, phone, description }: IUpdateSchedule) {
+    const validateInput = updateSchemaSchedule.parse({
+      id,
+      date,
+      phone,
+      description,
+      user_id,
+    });
 
+    const dateFormatted = new Date(validateInput.date);
     const minuteStart = startOfMinute(dateFormatted);
 
     if (isBefore(minuteStart, new Date())) {
       throw new Error('Não é permitido agendar data antiga');
     }
 
+    if (!user_id) {
+      throw new Error('Usuário não encontrado');
+    }
     const checkIsAvailable =
-      await this.schedulesRepository.findIfVerificationIsAvailable(
-        minuteStart,
-        user_id
-      );
+      await this.schedulesRepository.findIfVerificationIsAvailable({
+        date: minuteStart,
+        user_id: validateInput.user_id,
+      });
 
     if (checkIsAvailable) {
       throw new Error('A data agendada não está disponível');
     }
 
-    const result = await this.schedulesRepository.update(
-      id,
-      date,
-      phone,
-      description
-    );
+    const result = await this.schedulesRepository.update({
+      id: validateInput.id,
+      date: validateInput.date,
+      phone: validateInput.phone,
+      description: validateInput.description,
+    });
     return result;
   }
 

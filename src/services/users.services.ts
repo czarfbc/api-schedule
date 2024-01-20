@@ -1,23 +1,40 @@
 import { compare, hash } from 'bcrypt';
-import { ICreate, IUpdate } from '../interfaces/users.interface';
+import {
+  IAuthUsers,
+  ICreateUsers,
+  IUpdateUsers,
+} from '../interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
 import { sign, verify } from 'jsonwebtoken';
-import { Email } from '../utils/email';
+import { EmailUtils } from '../utils/email.utils';
+import { env } from '../z.schema/env.z.schema';
+import {
+  createSchemaUsers,
+  updateSchemaUsers,
+} from '../z.schema/users.z.schema';
 
 class UsersServices {
   private usersRepository: UsersRepository;
-  private email: Email;
+  private email: EmailUtils;
 
   constructor() {
     this.usersRepository = new UsersRepository();
-    this.email = new Email();
+    this.email = new EmailUtils();
   }
 
-  async create({ name, email, password }: ICreate) {
+  async create({ name, email, password }: ICreateUsers) {
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (findUser) {
       throw new Error('Usuário já existe');
     }
+
+    const validateInput = createSchemaUsers.parse({ name, email, password });
+    const hashPassword = await hash(validateInput.password, 10);
+    const create = await this.usersRepository.create({
+      name: validateInput.name,
+      email: validateInput.email,
+      password: hashPassword,
+    });
 
     const emailData = await this.email.sendEmail({
       inviteTo: email,
@@ -25,17 +42,10 @@ class UsersServices {
       html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
     });
 
-    const hashPassword = await hash(password, 10);
-    const create = await this.usersRepository.create({
-      name,
-      email,
-      password: hashPassword,
-    });
-
     return { create, emailData };
   }
 
-  async update({ oldPassword, newPassword, user_id, name }: IUpdate) {
+  async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
     if (oldPassword && newPassword) {
       const findUserById = await this.usersRepository.findUserById(user_id);
       if (!findUserById) {
@@ -47,12 +57,17 @@ class UsersServices {
         throw new Error('Senha inválida');
       }
 
-      const password = await hash(newPassword, 10);
-
+      const validateInput = updateSchemaUsers.parse({
+        name,
+        oldPassword,
+        newPassword,
+        user_id,
+      });
+      const password = await hash(validateInput.newPassword, 10);
       const result = await this.usersRepository.update({
         newPassword: password,
-        user_id,
-        name,
+        user_id: validateInput.user_id,
+        name: validateInput.name,
       });
 
       return {
@@ -64,7 +79,7 @@ class UsersServices {
     }
   }
 
-  async auth(email: string, password: string) {
+  async auth({ email, password }: IAuthUsers) {
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (!findUser) {
       throw new Error('Usuário ou senha invalido');
@@ -75,12 +90,11 @@ class UsersServices {
       throw new Error('Usuário ou senha invalido');
     }
 
-    let secretKey: string | undefined = process.env.ACCESS_KEY_TOKEN;
+    let secretKey: string = env.ACCESS_KEY_TOKEN;
     if (!secretKey) {
       throw new Error('Não há chave de token');
     }
-    let secretKeyRefreshToken: string | undefined =
-      process.env.ACCESS_KEY_TOKEN_REFRESH;
+    let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
     if (!secretKeyRefreshToken) {
       throw new Error('Não há chave de token');
     }
@@ -108,13 +122,12 @@ class UsersServices {
     if (!refresh_token) {
       throw new Error('Refresh token ausente');
     }
-    let secretKeyRefreshToken: string | undefined =
-      process.env.ACCESS_KEY_TOKEN_REFRESH;
+    let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
     if (!secretKeyRefreshToken) {
       throw new Error('Não há chave de refresh token');
     }
 
-    let secretKey: string | undefined = process.env.ACCESS_KEY_TOKEN;
+    let secretKey: string = env.ACCESS_KEY_TOKEN;
     if (!secretKey) {
       throw new Error('Não há chave de refresh token');
     }
