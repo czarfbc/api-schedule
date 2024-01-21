@@ -2,6 +2,7 @@ import { compare, hash } from 'bcrypt';
 import {
   IAuthUsers,
   ICreateUsers,
+  IRecoveryPassword,
   IUpdateUsers,
 } from '../interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
@@ -143,6 +144,54 @@ class UsersServices {
       expiresIn: '7d',
     });
     return { token: newToken, refresh_token: refreshToken };
+  }
+
+  async forgotPassword(email: string) {
+    const findUser = await this.usersRepository.findUserByEmail(email);
+
+    if (!findUser) {
+      throw new Error('User not found');
+    }
+
+    const oneHours: number = 3600000;
+    const resetToken = await hash(findUser.email + Date.now(), 10);
+    const resetTokenExpiry = new Date(Date.now() + oneHours);
+    const token = await this.usersRepository.updateResetToken({
+      resetToken,
+      resetTokenExpiry,
+      user: findUser,
+    });
+
+    const emailData = await this.email.sendEmail({
+      inviteTo: email,
+      subject: 'Recuperação de Senha!!!',
+      html: `"<p>codigo para recuperar senha <h1>${token.resetToken}</h1></p>`,
+    });
+
+    if (!emailData) {
+      throw new Error('Error sending email');
+    }
+
+    return emailData;
+  }
+
+  async recoveryPassword({ resetToken, newPassword }: IRecoveryPassword) {
+    const findUser = await this.usersRepository.findUserByToken(resetToken);
+
+    if (!findUser) throw new Error('Token invalid');
+
+    const now = new Date();
+
+    if (findUser.resetTokenExpiry && now > findUser.resetTokenExpiry)
+      throw new Error('Token expired');
+
+    const hashedPassword = await hash(newPassword, 10);
+
+    const result = await this.usersRepository.updatePassword({
+      newPassword: hashedPassword,
+      email: findUser.email,
+    });
+    return result;
   }
 }
 export { UsersServices };
