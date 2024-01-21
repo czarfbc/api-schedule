@@ -9,7 +9,8 @@ export class App {
   constructor(corsConfig: CorsOptions) {
     this.app = express();
     this.middleware(corsConfig);
-    this.setupRoutes();
+    this.setupUsersRoutes();
+    this.setupSchedulesRoutes();
   }
 
   private middleware(corsConfig: CorsOptions) {
@@ -18,12 +19,14 @@ export class App {
     this.app.use(express.urlencoded({ extended: true }));
   }
 
-  private setupRoutes() {
+  private setupUsersRoutes() {
     const userRouters = new UserRoutes();
-    const userBaseRoute = '/user';
+    const userBaseRoute = '/users';
     this.app.use(userBaseRoute, userRouters.postRoutes());
     this.app.use(userBaseRoute, userRouters.patchRoutes());
+  }
 
+  private setupSchedulesRoutes() {
     const schedulesRoutes = new SchedulesRoutes();
     const scheduleBaseRoute = '/schedules';
     this.app.use(scheduleBaseRoute, schedulesRoutes.postRoutes());

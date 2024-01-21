@@ -29,7 +29,7 @@ class SchedulesService {
     const minuteStart = startOfMinute(dateFormatted);
 
     if (isBefore(minuteStart, new Date())) {
-      throw new Error('Não é permitido agendar data antiga');
+      throw new Error('It is not allowed to schedule an old date');
     }
 
     const checkIsAvailable =
@@ -39,7 +39,7 @@ class SchedulesService {
       });
 
     if (checkIsAvailable) {
-      throw new Error('A data agendada não está disponível');
+      throw new Error('The scheduled date is not available');
     }
 
     const create = await this.schedulesRepository.create({
@@ -80,11 +80,11 @@ class SchedulesService {
     const minuteStart = startOfMinute(dateFormatted);
 
     if (isBefore(minuteStart, new Date())) {
-      throw new Error('Não é permitido agendar data antiga');
+      throw new Error('It is not allowed to schedule an old date');
     }
 
     if (!user_id) {
-      throw new Error('Usuário não encontrado');
+      throw new Error('User not found');
     }
     const checkIsAvailable =
       await this.schedulesRepository.findIfVerificationIsAvailable({
@@ -93,7 +93,7 @@ class SchedulesService {
       });
 
     if (checkIsAvailable) {
-      throw new Error('A data agendada não está disponível');
+      throw new Error('The scheduled date is not available');
     }
 
     const result = await this.schedulesRepository.update({

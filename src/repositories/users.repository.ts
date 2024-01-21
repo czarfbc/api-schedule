@@ -1,5 +1,10 @@
 import { prisma } from '../database/prisma';
-import { ICreateUsers, IUpdateUsers } from '../interfaces/users.interface';
+import {
+  ICreateUsers,
+  IUpdatePassword,
+  IUpdateUsers,
+  IUsersUpdateResetToken,
+} from '../interfaces/users.interface';
 import {
   createSchemaUsers,
   updateSchemaUsers,
@@ -53,6 +58,48 @@ class UsersRepository {
         name: validateInput.name,
       },
     });
+    return result;
+  }
+
+  async updateResetToken({
+    resetToken,
+    resetTokenExpiry,
+    user,
+  }: IUsersUpdateResetToken) {
+    const result = await prisma.users.update({
+      where: {
+        email: user.email,
+      },
+      data: {
+        resetToken,
+        resetTokenExpiry,
+      },
+    });
+
+    return result;
+  }
+
+  async findUserByToken(resetToken: string) {
+    const result = await prisma.users.findFirstOrThrow({
+      where: {
+        resetToken,
+      },
+    });
+
+    return result;
+  }
+  async updatePassword({ newPassword, email }: IUpdatePassword) {
+    const result = await prisma.users.update({
+      where: {
+        email,
+      },
+      data: {
+        password: newPassword,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
+    });
+
     return result;
   }
 }
