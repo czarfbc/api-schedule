@@ -144,5 +144,34 @@ class UsersServices {
     });
     return { token: newToken, refresh_token: refreshToken };
   }
+
+  async forgotPassword(email: string) {
+    const findUser = await this.usersRepository.findUserByEmail(email);
+
+    if (!findUser) {
+      throw new Error('User not found');
+    }
+
+    const oneHours: number = 3600000;
+    const resetToken = await hash(findUser.email + Date.now(), 10);
+    const resetTokenExpiry = new Date(Date.now() + oneHours);
+    const token = await this.usersRepository.updateResetToken({
+      resetToken,
+      resetTokenExpiry,
+      user: findUser,
+    });
+
+    const emailData = await this.email.sendEmail({
+      inviteTo: email,
+      subject: 'Recuperação de Senha!!!',
+      html: `"<p>codigo para recuperar senha <h1>${token.resetToken}</h1></p>`,
+    });
+
+    if (!emailData) {
+      throw new Error('Error sending email');
+    }
+
+    return emailData;
+  }
 }
 export { UsersServices };

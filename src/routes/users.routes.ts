@@ -28,6 +28,11 @@ class UserRoutes {
       this.usersController.refresh.bind(this.usersController)
     );
 
+    this.router.post(
+      '/forgotPassword',
+      this.usersController.forgotPassword.bind(this.usersController)
+    );
+
     return this.router;
   }
 
