@@ -2,6 +2,7 @@ import { compare, hash } from 'bcrypt';
 import {
   IAuthUsers,
   ICreateUsers,
+  IRecoveryPassword,
   IUpdateUsers,
 } from '../interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
@@ -172,6 +173,25 @@ class UsersServices {
     }
 
     return emailData;
+  }
+
+  async recoveryPassword({ resetToken, newPassword }: IRecoveryPassword) {
+    const findUser = await this.usersRepository.findUserByToken(resetToken);
+
+    if (!findUser) throw new Error('Token invalid');
+
+    const now = new Date();
+
+    if (findUser.resetTokenExpiry && now > findUser.resetTokenExpiry)
+      throw new Error('Token expired');
+
+    const hashedPassword = await hash(newPassword, 10);
+
+    const result = await this.usersRepository.updatePassword({
+      newPassword: hashedPassword,
+      email: findUser.email,
+    });
+    return result;
   }
 }
 export { UsersServices };

@@ -1,6 +1,7 @@
 import { prisma } from '../database/prisma';
 import {
   ICreateUsers,
+  IUpdatePassword,
   IUpdateUsers,
   IUsersUpdateResetToken,
 } from '../interfaces/users.interface';
@@ -72,6 +73,30 @@ class UsersRepository {
       data: {
         resetToken,
         resetTokenExpiry,
+      },
+    });
+
+    return result;
+  }
+
+  async findUserByToken(resetToken: string) {
+    const result = await prisma.users.findFirstOrThrow({
+      where: {
+        resetToken,
+      },
+    });
+
+    return result;
+  }
+  async updatePassword({ newPassword, email }: IUpdatePassword) {
+    const result = await prisma.users.update({
+      where: {
+        email,
+      },
+      data: {
+        password: newPassword,
+        resetToken: null,
+        resetTokenExpiry: null,
       },
     });
 

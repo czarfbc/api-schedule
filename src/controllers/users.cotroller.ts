@@ -77,5 +77,22 @@ class UsersController {
       next(error);
     }
   }
+
+  async recoveryPassword(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    const { resetToken, newPassword } = request.body;
+    try {
+      const result = await this.usersServices.recoveryPassword({
+        resetToken,
+        newPassword,
+      });
+      return response.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 export { UsersController };

@@ -33,6 +33,11 @@ class UserRoutes {
       this.usersController.forgotPassword.bind(this.usersController)
     );
 
+    this.router.post(
+      '/updatePassword',
+      this.usersController.recoveryPassword.bind(this.usersController)
+    );
+
     return this.router;
   }
 

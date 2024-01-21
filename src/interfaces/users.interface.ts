@@ -24,6 +24,16 @@ export interface IUsersUpdateResetToken {
   user: Users;
 }
 
+export interface IRecoveryPassword {
+  resetToken: string;
+  newPassword: string;
+}
+
+export interface IUpdatePassword {
+  newPassword: string;
+  email: string;
+}
+
 export interface IPayload {
   sub: string;
 }
