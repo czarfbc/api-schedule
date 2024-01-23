@@ -1,5 +1,5 @@
 import { App } from './app';
-import { env } from './z.schema/env.z.schema';
+import { env } from './validations/z.schema/env.z.schema';
 
 const corsConfig = {
   origin: 'http://localhost:3003',

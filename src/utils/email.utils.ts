@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
-import { ISendEmail } from '../interfaces/email.interface';
-import { env } from '../z.schema/env.z.schema';
-import { emailSchema } from '../z.schema/email.z.schema';
+import { ISendEmail } from '../validations/interfaces/email.interface';
+import { env } from '../validations/z.schema/env.z.schema';
+import { emailSchema } from '../validations/z.schema/email.z.schema';
 
 class EmailUtils {
   private resend: Resend;

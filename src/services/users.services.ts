@@ -4,15 +4,15 @@ import {
   ICreateUsers,
   IRecoveryPassword,
   IUpdateUsers,
-} from '../interfaces/users.interface';
+} from '../validations/interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
 import { sign, verify } from 'jsonwebtoken';
 import { EmailUtils } from '../utils/email.utils';
-import { env } from '../z.schema/env.z.schema';
+import { env } from '../validations/z.schema/env.z.schema';
 import {
   createSchemaUsers,
   updateSchemaUsers,
-} from '../z.schema/users.z.schema';
+} from '../validations/z.schema/users.z.schema';
 
 class UsersServices {
   private usersRepository: UsersRepository;
