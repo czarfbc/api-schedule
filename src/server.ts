@@ -9,6 +9,6 @@ const corsConfig = {
 
 const PORT = env.PORT;
 
-const app = new App(corsConfig);
+const app = new App();
 
 app.listen(PORT);

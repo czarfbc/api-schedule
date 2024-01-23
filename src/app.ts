@@ -6,14 +6,14 @@ import cors, { CorsOptions } from 'cors';
 export class App {
   private app: Application;
 
-  constructor(corsConfig: CorsOptions) {
+  constructor(corsConfig?: CorsOptions) {
     this.app = express();
     this.middleware(corsConfig);
     this.setupUsersRoutes();
     this.setupSchedulesRoutes();
   }
 
-  private middleware(corsConfig: CorsOptions) {
+  private middleware(corsConfig?: CorsOptions) {
     this.app.use(express.json());
     this.app.use(cors(corsConfig));
     this.app.use(express.urlencoded({ extended: true }));
