@@ -76,8 +76,8 @@ class UsersServices {
     });
 
     return {
-      token,
-      refresh_token: refreshToken,
+      token: { token, expiresIn: '60s' },
+      refreshToken: { refreshToken, expiresIn: '7d' },
       user: {
         name: findUser.name,
         email: findUser.email,
@@ -85,8 +85,8 @@ class UsersServices {
     };
   }
 
-  async refresh(refresh_token: string) {
-    if (!refresh_token) {
+  async refresh(refreshToken: string) {
+    if (!refreshToken) {
       throw new Error('Refresh token missing');
     }
     let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
@@ -99,17 +99,20 @@ class UsersServices {
       throw new Error('There is no token key');
     }
 
-    const verifyRefreshToken = verify(refresh_token, secretKeyRefreshToken);
+    const verifyRefreshToken = verify(refreshToken, secretKeyRefreshToken);
 
     const { sub } = verifyRefreshToken;
 
     const newToken = sign({ sub }, secretKey, {
       expiresIn: '1h',
     });
-    const refreshToken = sign({ sub }, secretKeyRefreshToken, {
+    const newRefreshToken = sign({ sub }, secretKeyRefreshToken, {
       expiresIn: '7d',
     });
-    return { token: newToken, refresh_token: refreshToken };
+    return {
+      token: { token: newToken, expiresIn: '1h' },
+      refreshToken: { refreshToken: newRefreshToken, expiresIn: '7d' },
+    };
   }
 
   async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
