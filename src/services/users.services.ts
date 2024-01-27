@@ -46,40 +46,6 @@ class UsersServices {
     return { create, emailData };
   }
 
-  async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
-    if (oldPassword && newPassword) {
-      const findUserById = await this.usersRepository.findUserById(user_id);
-      if (!findUserById) {
-        throw new Error('User not found');
-      }
-
-      const passwordMatch = await compare(oldPassword, findUserById.password);
-      if (!passwordMatch) {
-        throw new Error('nvalid password');
-      }
-
-      const validateInput = updateSchemaUsers.parse({
-        name,
-        oldPassword,
-        newPassword,
-        user_id,
-      });
-      const password = await hash(validateInput.newPassword, 10);
-      const result = await this.usersRepository.update({
-        newPassword: password,
-        user_id: validateInput.user_id,
-        name: validateInput.name,
-      });
-
-      return {
-        result,
-        message: 'User updated successfully',
-      };
-    } else {
-      throw new Error('Fill in the fields correctly');
-    }
-  }
-
   async auth({ email, password }: IAuthUsers) {
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (!findUser) {
@@ -144,6 +110,40 @@ class UsersServices {
       expiresIn: '7d',
     });
     return { token: newToken, refresh_token: refreshToken };
+  }
+
+  async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
+    if (oldPassword && newPassword) {
+      const findUserById = await this.usersRepository.findUserById(user_id);
+      if (!findUserById) {
+        throw new Error('User not found');
+      }
+
+      const passwordMatch = await compare(oldPassword, findUserById.password);
+      if (!passwordMatch) {
+        throw new Error('nvalid password');
+      }
+
+      const validateInput = updateSchemaUsers.parse({
+        name,
+        oldPassword,
+        newPassword,
+        user_id,
+      });
+      const password = await hash(validateInput.newPassword, 10);
+      const result = await this.usersRepository.update({
+        newPassword: password,
+        user_id: validateInput.user_id,
+        name: validateInput.name,
+      });
+
+      return {
+        result,
+        message: 'User updated successfully',
+      };
+    } else {
+      throw new Error('Fill in the fields correctly');
+    }
   }
 
   async forgotPassword(email: string) {
