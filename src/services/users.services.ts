@@ -124,7 +124,7 @@ class UsersServices {
 
       const passwordMatch = await compare(oldPassword, findUserById.password);
       if (!passwordMatch) {
-        throw new Error('nvalid password');
+        throw new Error('Old password invalid');
       }
 
       const validateInput = updateSchemaUsers.parse({

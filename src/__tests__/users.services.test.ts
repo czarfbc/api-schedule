@@ -192,9 +192,27 @@ describe('UsersServices', () => {
     });
   });
 
-  describe('update', () => {});
+  describe('update', () => {
+    it('should throw an error user not found', async () => {});
 
-  describe('forgotPassword', () => {});
+    it('should throw an error old password invalid', async () => {});
 
-  describe('recoveryPassword', () => {});
+    it('should update user', async () => {});
+  });
+
+  describe('forgotPassword', () => {
+    it('should throw an error user not found', async () => {});
+
+    it('should throw an error email not sending', async () => {});
+
+    it('should send email', async () => {});
+  });
+
+  describe('recoveryPassword', () => {
+    it('should throw an error token invalid', async () => {});
+
+    it('should throw an error token expired', async () => {});
+
+    it('should update password', async () => {});
+  });
 });
