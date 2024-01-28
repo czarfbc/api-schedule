@@ -193,11 +193,80 @@ describe('UsersServices', () => {
   });
 
   describe('update', () => {
-    it('should throw an error user not found', async () => {});
+    it('should throw an error user not found', async () => {
+      mockUsersRepository.findUserById.mockResolvedValueOnce(null);
+      await expect(
+        usersServices.update({
+          user_id: 'uuid',
+          name: 'name',
+          oldPassword: 'oldPassword',
+          newPassword: 'newPassword',
+        })
+      ).rejects.toThrow('User not found');
+    });
 
-    it('should throw an error old password invalid', async () => {});
+    it('should throw an error old password invalid', async () => {
+      mockUsersRepository.findUserById.mockResolvedValueOnce({} as any);
+      (compare as jest.Mock).mockResolvedValueOnce(false);
+      await expect(
+        usersServices.update({
+          user_id: 'uuid',
+          name: 'name',
+          oldPassword: 'oldPassword',
+          newPassword: 'newPassword',
+        })
+      ).rejects.toThrow('Old password invalid');
+    });
 
-    it('should update user', async () => {});
+    const dateCreatedAt = new Date();
+    const dateUpdatedAt = new Date();
+    it('should update user', async () => {
+      mockUsersRepository.findUserById.mockResolvedValueOnce({
+        id: '5d09d3cb-c933-4975-9fea-6d99113d908f',
+        email: 'test@test.com',
+        password: 'hashedPassword',
+        name: 'czarfbc',
+        resetToken: null,
+        resetTokenExpiry: null,
+        createdAt: dateCreatedAt,
+        updatedAt: dateUpdatedAt,
+      });
+
+      (compare as jest.Mock).mockResolvedValueOnce(true);
+      (hash as jest.Mock).mockResolvedValueOnce('hashedPassword');
+
+      mockUsersRepository.update.mockResolvedValueOnce({
+        id: '5d09d3cb-c933-4975-9fea-6d99113d908f',
+        email: 'test@test.com',
+        password: 'hashedPassword',
+        name: 'czarfbc-updated',
+        resetToken: null,
+        resetTokenExpiry: null,
+        createdAt: dateCreatedAt,
+        updatedAt: dateUpdatedAt,
+      });
+
+      const result = await usersServices.update({
+        user_id: '5d09d3cb-c933-4975-9fea-6d99113d908f',
+        name: 'czarfbc-updated',
+        oldPassword: 'oldPassword',
+        newPassword: 'newPassword',
+      });
+
+      expect(result).toEqual({
+        result: {
+          id: '5d09d3cb-c933-4975-9fea-6d99113d908f',
+          email: 'test@test.com',
+          password: 'hashedPassword',
+          name: 'czarfbc-updated',
+          resetToken: null,
+          resetTokenExpiry: null,
+          createdAt: dateCreatedAt,
+          updatedAt: dateUpdatedAt,
+        },
+        message: 'User updated successfully',
+      });
+    });
   });
 
   describe('forgotPassword', () => {
