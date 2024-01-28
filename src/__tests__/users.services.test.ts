@@ -270,11 +270,13 @@ describe('UsersServices', () => {
   });
 
   describe('forgotPassword', () => {
-    it('should throw an error user not found', async () => {});
-
-    it('should throw an error email not sending', async () => {});
-
-    it('should send email', async () => {});
+    it('should throw an error user not found', async () => {
+      const email = 'nonexistent@test.com';
+      mockUsersRepository.findUserByEmail.mockResolvedValueOnce(null);
+      await expect(usersServices.forgotPassword(email)).rejects.toThrow(
+        'User not found'
+      );
+    });
   });
 
   describe('recoveryPassword', () => {
