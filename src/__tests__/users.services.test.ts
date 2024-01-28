@@ -280,10 +280,82 @@ describe('UsersServices', () => {
   });
 
   describe('recoveryPassword', () => {
-    it('should throw an error token invalid', async () => {});
+    it('should throw an error token invalid', async () => {
+      mockUsersRepository.findUserByToken.mockResolvedValueOnce(null as any);
 
-    it('should throw an error token expired', async () => {});
+      await expect(
+        usersServices.recoveryPassword({
+          resetToken: 'invalidToken',
+          newPassword: 'newPassword',
+        })
+      ).rejects.toThrow('Token invalid');
+    });
 
-    it('should update password', async () => {});
+    it('should throw an error token expired', async () => {
+      const expiredTokenUser = {
+        id: 'uuid',
+        email: 'expired@test.com',
+        password: 'hashedPassword',
+        name: 'Expired User',
+        resetToken: null,
+        resetTokenExpiry: new Date('2022-01-01'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockUsersRepository.findUserByToken.mockResolvedValueOnce(
+        expiredTokenUser
+      );
+
+      mockUsersRepository.findUserByToken.mockResolvedValueOnce(
+        expiredTokenUser
+      );
+
+      await expect(
+        usersServices.recoveryPassword({
+          resetToken: 'validToken',
+          newPassword: 'newPassword',
+        })
+      ).rejects.toThrow('Token expired');
+    });
+
+    it('should update password', async () => {
+      const validTokenUser = {
+        id: 'uuid',
+        email: 'test@test.com',
+        password: 'hashedPassword',
+        name: 'Test User',
+        resetToken: null,
+        resetTokenExpiry: new Date('2024-01-30'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockUsersRepository.findUserByToken.mockResolvedValueOnce(validTokenUser);
+
+      const expectedUpdateResult = {
+        id: 'uuid',
+        email: 'test@test.com',
+        password: 'hashedNewPassword',
+        name: 'name',
+        resetToken: null,
+        resetTokenExpiry: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      (
+        usersServices as any
+      ).usersRepository.updatePassword.mockResolvedValueOnce(
+        Promise.resolve(expectedUpdateResult)
+      );
+
+      const result = await usersServices.recoveryPassword({
+        resetToken: 'validToken',
+        newPassword: 'newPassword',
+      });
+
+      expect(result).toEqual(expectedUpdateResult);
+    });
   });
 });
