@@ -4,11 +4,11 @@ import {
   IUpdatePassword,
   IUpdateUsers,
   IUsersUpdateResetToken,
-} from '../interfaces/users.interface';
+} from '../validations/interfaces/users.interface';
 import {
   createSchemaUsers,
   updateSchemaUsers,
-} from '../z.schema/users.z.schema';
+} from '../validations/z.schema/users.z.schema';
 
 class UsersRepository {
   async create({ name, email, password }: ICreateUsers) {

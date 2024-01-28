@@ -1,5 +1,5 @@
 import { App } from './app';
-import { env } from './z.schema/env.z.schema';
+import { env } from './validations/z.schema/env.z.schema';
 
 const corsConfig = {
   origin: 'http://localhost:3003',
@@ -9,6 +9,6 @@ const corsConfig = {
 
 const PORT = env.PORT;
 
-const app = new App(corsConfig);
+const app = new App();
 
 app.listen(PORT);

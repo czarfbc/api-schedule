@@ -5,11 +5,11 @@ import {
   ICreateSchedules,
   IFindSchedules,
   IUpdateSchedule,
-} from '../interfaces/schedules.interface';
+} from '../validations/interfaces/schedules.interface';
 import {
   createSchemaSchedules,
   updateSchemaSchedule,
-} from '../z.schema/schedules.z.schema';
+} from '../validations/z.schema/schedules.z.schema';
 
 class SchedulesRepository {
   async create({ name, phone, date, user_id, description }: ICreateSchedules) {

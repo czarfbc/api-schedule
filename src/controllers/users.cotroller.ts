@@ -34,9 +34,9 @@ class UsersController {
   }
 
   async refresh(request: Request, response: Response, next: NextFunction) {
-    const { refresh_token } = request.body;
+    const { refreshToken } = request.body;
     try {
-      const result = await this.usersServices.refresh(refresh_token);
+      const result = await this.usersServices.refresh(refreshToken);
       return response.json(result);
     } catch (error) {
       next(error);

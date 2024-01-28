@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
-import { IPayload } from '../interfaces/users.interface';
-import { env } from '../z.schema/env.z.schema';
+import { IPayload } from '../validations/interfaces/users.interface';
+import { env } from '../validations/z.schema/env.z.schema';
 
 class AuthMiddleware {
   auth(request: Request, response: Response, next: NextFunction) {

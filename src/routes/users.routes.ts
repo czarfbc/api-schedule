@@ -28,16 +28,6 @@ class UserRoutes {
       this.usersController.refresh.bind(this.usersController)
     );
 
-    this.router.post(
-      '/forgotPassword',
-      this.usersController.forgotPassword.bind(this.usersController)
-    );
-
-    this.router.post(
-      '/updatePassword',
-      this.usersController.recoveryPassword.bind(this.usersController)
-    );
-
     return this.router;
   }
 
@@ -46,6 +36,16 @@ class UserRoutes {
       '/update',
       this.authMiddleware.auth.bind(this.authMiddleware),
       this.usersController.update.bind(this.usersController)
+    );
+
+    this.router.patch(
+      '/forgotPassword',
+      this.usersController.forgotPassword.bind(this.usersController)
+    );
+
+    this.router.patch(
+      '/updatePassword',
+      this.usersController.recoveryPassword.bind(this.usersController)
     );
 
     return this.router;

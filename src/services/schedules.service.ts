@@ -2,13 +2,13 @@ import {
   ICreateSchedules,
   IFindSchedules,
   IUpdateSchedule,
-} from '../interfaces/schedules.interface';
+} from '../validations/interfaces/schedules.interface';
 import { isBefore, startOfMinute } from 'date-fns';
 import { SchedulesRepository } from '../repositories/schedules.repository';
 import {
   createSchemaSchedules,
   updateSchemaSchedule,
-} from '../z.schema/schedules.z.schema';
+} from '../validations/z.schema/schedules.z.schema';
 
 class SchedulesService {
   private schedulesRepository: SchedulesRepository;

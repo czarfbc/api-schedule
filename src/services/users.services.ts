@@ -4,15 +4,15 @@ import {
   ICreateUsers,
   IRecoveryPassword,
   IUpdateUsers,
-} from '../interfaces/users.interface';
+} from '../validations/interfaces/users.interface';
 import { UsersRepository } from '../repositories/users.repository';
 import { sign, verify } from 'jsonwebtoken';
 import { EmailUtils } from '../utils/email.utils';
-import { env } from '../z.schema/env.z.schema';
+import { env } from '../validations/z.schema/env.z.schema';
 import {
   createSchemaUsers,
   updateSchemaUsers,
-} from '../z.schema/users.z.schema';
+} from '../validations/z.schema/users.z.schema';
 
 class UsersServices {
   private usersRepository: UsersRepository;
@@ -46,40 +46,6 @@ class UsersServices {
     return { create, emailData };
   }
 
-  async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
-    if (oldPassword && newPassword) {
-      const findUserById = await this.usersRepository.findUserById(user_id);
-      if (!findUserById) {
-        throw new Error('User not found');
-      }
-
-      const passwordMatch = await compare(oldPassword, findUserById.password);
-      if (!passwordMatch) {
-        throw new Error('nvalid password');
-      }
-
-      const validateInput = updateSchemaUsers.parse({
-        name,
-        oldPassword,
-        newPassword,
-        user_id,
-      });
-      const password = await hash(validateInput.newPassword, 10);
-      const result = await this.usersRepository.update({
-        newPassword: password,
-        user_id: validateInput.user_id,
-        name: validateInput.name,
-      });
-
-      return {
-        result,
-        message: 'User updated successfully',
-      };
-    } else {
-      throw new Error('Fill in the fields correctly');
-    }
-  }
-
   async auth({ email, password }: IAuthUsers) {
     const findUser = await this.usersRepository.findUserByEmail(email);
     if (!findUser) {
@@ -110,8 +76,8 @@ class UsersServices {
     });
 
     return {
-      token,
-      refresh_token: refreshToken,
+      token: { token, expiresIn: '60s' },
+      refreshToken: { refreshToken, expiresIn: '7d' },
       user: {
         name: findUser.name,
         email: findUser.email,
@@ -119,8 +85,8 @@ class UsersServices {
     };
   }
 
-  async refresh(refresh_token: string) {
-    if (!refresh_token) {
+  async refresh(refreshToken: string) {
+    if (!refreshToken) {
       throw new Error('Refresh token missing');
     }
     let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
@@ -133,17 +99,54 @@ class UsersServices {
       throw new Error('There is no token key');
     }
 
-    const verifyRefreshToken = verify(refresh_token, secretKeyRefreshToken);
+    const verifyRefreshToken = verify(refreshToken, secretKeyRefreshToken);
 
     const { sub } = verifyRefreshToken;
 
     const newToken = sign({ sub }, secretKey, {
       expiresIn: '1h',
     });
-    const refreshToken = sign({ sub }, secretKeyRefreshToken, {
+    const newRefreshToken = sign({ sub }, secretKeyRefreshToken, {
       expiresIn: '7d',
     });
-    return { token: newToken, refresh_token: refreshToken };
+    return {
+      token: { token: newToken, expiresIn: '1h' },
+      refreshToken: { refreshToken: newRefreshToken, expiresIn: '7d' },
+    };
+  }
+
+  async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
+    if (oldPassword && newPassword) {
+      const findUserById = await this.usersRepository.findUserById(user_id);
+      if (!findUserById) {
+        throw new Error('User not found');
+      }
+
+      const passwordMatch = await compare(oldPassword, findUserById.password);
+      if (!passwordMatch) {
+        throw new Error('Old password invalid');
+      }
+
+      const validateInput = updateSchemaUsers.parse({
+        name,
+        oldPassword,
+        newPassword,
+        user_id,
+      });
+      const password = await hash(validateInput.newPassword, 10);
+      const result = await this.usersRepository.update({
+        newPassword: password,
+        user_id: validateInput.user_id,
+        name: validateInput.name,
+      });
+
+      return {
+        result,
+        message: 'User updated successfully',
+      };
+    } else {
+      throw new Error('Fill in the fields correctly');
+    }
   }
 
   async forgotPassword(email: string) {
