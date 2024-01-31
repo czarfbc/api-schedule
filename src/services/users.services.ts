@@ -5,7 +5,7 @@ import {
   IRecoveryPassword,
   IUpdateUsers,
 } from '../validations/interfaces/users.interface';
-import { UsersRepository } from '../repositories/users.repository';
+import { UsersDALs } from '../database/data.access.layer/users.dals';
 import { sign, verify } from 'jsonwebtoken';
 import { EmailUtils } from '../utils/email.utils';
 import { env } from '../validations/z.schema/env.z.schema';
@@ -17,23 +17,23 @@ import {
 } from '../validations/z.schema/users.z.schema';
 
 class UsersServices {
-  private usersRepository: UsersRepository;
+  private usersDALs: UsersDALs;
   private email: EmailUtils;
 
   constructor() {
-    this.usersRepository = new UsersRepository();
+    this.usersDALs = new UsersDALs();
     this.email = new EmailUtils();
   }
 
   async create({ name, email, password }: ICreateUsers) {
-    const findUser = await this.usersRepository.findUserByEmail(email);
+    const findUser = await this.usersDALs.findUserByEmail(email);
     if (findUser) {
       throw new Error('User already exists');
     }
 
     const validateInput = createSchemaUsers.parse({ name, email, password });
     const hashPassword = await hash(validateInput.password, 10);
-    const create = await this.usersRepository.create({
+    const create = await this.usersDALs.create({
       name: validateInput.name,
       email: validateInput.email,
       password: hashPassword,
@@ -49,7 +49,7 @@ class UsersServices {
   }
 
   async auth({ email, password }: IAuthUsers) {
-    const findUser = await this.usersRepository.findUserByEmail(email);
+    const findUser = await this.usersDALs.findUserByEmail(email);
     if (!findUser) {
       throw new Error('Invalid email or password');
     }
@@ -119,7 +119,7 @@ class UsersServices {
 
   async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
     if (oldPassword && newPassword) {
-      const findUserById = await this.usersRepository.findUserById(user_id);
+      const findUserById = await this.usersDALs.findUserById(user_id);
       if (!findUserById) {
         throw new Error('User not found');
       }
@@ -136,7 +136,7 @@ class UsersServices {
         user_id,
       });
       const password = await hash(validateInput.newPassword, 10);
-      const result = await this.usersRepository.update({
+      const result = await this.usersDALs.update({
         newPassword: password,
         user_id: validateInput.user_id,
         name: validateInput.name,
@@ -152,7 +152,7 @@ class UsersServices {
   }
 
   async forgotPassword(email: string) {
-    const findUser = await this.usersRepository.findUserByEmail(email);
+    const findUser = await this.usersDALs.findUserByEmail(email);
 
     if (!findUser) {
       throw new Error('User not found');
@@ -168,7 +168,7 @@ class UsersServices {
       email: findUser.email,
     });
 
-    const token = await this.usersRepository.updateResetToken({
+    const token = await this.usersDALs.updateResetToken({
       resetToken: validateInput.resetToken,
       resetTokenExpiry: validateInput.resetTokenExpiry,
       email: validateInput.email,
@@ -188,7 +188,7 @@ class UsersServices {
   }
 
   async recoveryPassword({ resetToken, newPassword }: IRecoveryPassword) {
-    const findUser = await this.usersRepository.findUserByToken(resetToken);
+    const findUser = await this.usersDALs.findUserByToken(resetToken);
 
     if (!findUser) throw new Error('Token invalid');
 
@@ -204,7 +204,7 @@ class UsersServices {
 
     const hashedPassword = await hash(validateInput.newPassword, 10);
 
-    const result = await this.usersRepository.updatePassword({
+    const result = await this.usersDALs.updatePassword({
       newPassword: hashedPassword,
       email: findUser.email,
     });
