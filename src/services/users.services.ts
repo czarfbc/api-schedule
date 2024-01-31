@@ -162,7 +162,7 @@ class UsersServices {
     const token = await this.usersRepository.updateResetToken({
       resetToken,
       resetTokenExpiry,
-      user: findUser,
+      email: findUser.email,
     });
 
     const emailData = await this.email.sendEmail({

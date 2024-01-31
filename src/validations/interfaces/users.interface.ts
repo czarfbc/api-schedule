@@ -1,5 +1,3 @@
-import { Users } from '@prisma/client';
-
 export interface ICreateUsers {
   name: string;
   email: string;
@@ -21,7 +19,7 @@ export interface IAuthUsers {
 export interface IUsersUpdateResetToken {
   resetToken: string;
   resetTokenExpiry: Date;
-  user: Users;
+  email: string;
 }
 
 export interface IRecoveryPassword {

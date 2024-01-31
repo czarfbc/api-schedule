@@ -64,11 +64,11 @@ class UsersRepository {
   async updateResetToken({
     resetToken,
     resetTokenExpiry,
-    user,
+    email,
   }: IUsersUpdateResetToken) {
     const result = await prisma.users.update({
       where: {
-        email: user.email,
+        email,
       },
       data: {
         resetToken,
