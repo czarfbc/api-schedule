@@ -326,7 +326,7 @@ describe('UsersServices', () => {
         password: 'hashedPassword',
         name: 'Test User',
         resetToken: null,
-        resetTokenExpiry: new Date('2024-01-30'),
+        resetTokenExpiry: new Date('3000-03-30'),
         createdAt: new Date(),
         updatedAt: new Date(),
       };

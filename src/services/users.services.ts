@@ -11,6 +11,8 @@ import { EmailUtils } from '../utils/email.utils';
 import { env } from '../validations/z.schema/env.z.schema';
 import {
   createSchemaUsers,
+  recoveryPasswordSchemaUsers,
+  updateResetTokenSchemaUsers,
   updateSchemaUsers,
 } from '../validations/z.schema/users.z.schema';
 
@@ -159,10 +161,17 @@ class UsersServices {
     const oneHours: number = 3600000;
     const resetToken = await hash(findUser.email + Date.now(), 10);
     const resetTokenExpiry = new Date(Date.now() + oneHours);
-    const token = await this.usersRepository.updateResetToken({
+
+    const validateInput = updateResetTokenSchemaUsers.parse({
       resetToken,
       resetTokenExpiry,
-      user: findUser,
+      email: findUser.email,
+    });
+
+    const token = await this.usersRepository.updateResetToken({
+      resetToken: validateInput.resetToken,
+      resetTokenExpiry: validateInput.resetTokenExpiry,
+      email: validateInput.email,
     });
 
     const emailData = await this.email.sendEmail({
@@ -185,10 +194,15 @@ class UsersServices {
 
     const now = new Date();
 
-    if (findUser.resetTokenExpiry && now > findUser.resetTokenExpiry)
+    if (findUser.resetTokenExpiry && now > findUser.resetTokenExpiry) {
       throw new Error('Token expired');
+    }
 
-    const hashedPassword = await hash(newPassword, 10);
+    const validateInput = recoveryPasswordSchemaUsers.parse({
+      newPassword,
+    });
+
+    const hashedPassword = await hash(validateInput.newPassword, 10);
 
     const result = await this.usersRepository.updatePassword({
       newPassword: hashedPassword,
