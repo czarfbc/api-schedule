@@ -4,16 +4,16 @@ import {
   IUpdateSchedule,
 } from '../validations/interfaces/schedules.interface';
 import { isBefore, startOfMinute } from 'date-fns';
-import { SchedulesRepository } from '../repositories/schedules.repository';
+import { SchedulesDALs } from '../database/data.access.layer/schedules.dals';
 import {
   createSchemaSchedules,
   updateSchemaSchedule,
 } from '../validations/z.schema/schedules.z.schema';
 
 class SchedulesService {
-  private schedulesRepository: SchedulesRepository;
+  private schedulesDALs: SchedulesDALs;
   constructor() {
-    this.schedulesRepository = new SchedulesRepository();
+    this.schedulesDALs = new SchedulesDALs();
   }
 
   async create({ name, phone, date, user_id, description }: ICreateSchedules) {
@@ -33,7 +33,7 @@ class SchedulesService {
     }
 
     const checkIsAvailable =
-      await this.schedulesRepository.findIfVerificationIsAvailable({
+      await this.schedulesDALs.findIfVerificationIsAvailable({
         date: minuteStart,
         user_id: validateInput.user_id,
       });
@@ -42,7 +42,7 @@ class SchedulesService {
       throw new Error('The scheduled date is not available');
     }
 
-    const create = await this.schedulesRepository.create({
+    const create = await this.schedulesDALs.create({
       name: validateInput.name,
       phone: validateInput.phone,
       date: minuteStart,
@@ -53,7 +53,7 @@ class SchedulesService {
   }
 
   async findEverythingOfTheDay({ date, user_id }: IFindSchedules) {
-    const result = await this.schedulesRepository.findEverythingOfTheDay({
+    const result = await this.schedulesDALs.findEverythingOfTheDay({
       date,
       user_id,
     });
@@ -62,7 +62,7 @@ class SchedulesService {
   }
 
   async findAll(user_id: string) {
-    const result = await this.schedulesRepository.findAll(user_id);
+    const result = await this.schedulesDALs.findAll(user_id);
 
     return result;
   }
@@ -87,7 +87,7 @@ class SchedulesService {
       throw new Error('User not found');
     }
     const checkIsAvailable =
-      await this.schedulesRepository.findIfVerificationIsAvailable({
+      await this.schedulesDALs.findIfVerificationIsAvailable({
         date: minuteStart,
         user_id: validateInput.user_id,
       });
@@ -96,7 +96,7 @@ class SchedulesService {
       throw new Error('The scheduled date is not available');
     }
 
-    const result = await this.schedulesRepository.update({
+    const result = await this.schedulesDALs.update({
       id: validateInput.id,
       date: validateInput.date,
       phone: validateInput.phone,
@@ -106,11 +106,11 @@ class SchedulesService {
   }
 
   async delete(id: string) {
-    await this.schedulesRepository.delete(id);
+    await this.schedulesDALs.delete(id);
   }
 
   async deleteOldSchedules(user_id: string) {
-    const result = await this.schedulesRepository.deleteOldSchedules(user_id);
+    const result = await this.schedulesDALs.deleteOldSchedules(user_id);
 
     return result;
   }

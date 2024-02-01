@@ -5,7 +5,7 @@ import {
   IRecoveryPassword,
   IUpdateUsers,
 } from '../validations/interfaces/users.interface';
-import { UsersRepository } from '../repositories/users.repository';
+import { UsersDALs } from '../database/data.access.layer/users.dals';
 import { sign, verify } from 'jsonwebtoken';
 import { EmailUtils } from '../utils/email.utils';
 import { env } from '../validations/z.schema/env.z.schema';
@@ -15,25 +15,29 @@ import {
   updateResetTokenSchemaUsers,
   updateSchemaUsers,
 } from '../validations/z.schema/users.z.schema';
+import { ErrorsHelpers } from '../helpers/errors.helpers';
 
 class UsersServices {
-  private usersRepository: UsersRepository;
+  private usersDALs: UsersDALs;
   private email: EmailUtils;
 
   constructor() {
-    this.usersRepository = new UsersRepository();
+    this.usersDALs = new UsersDALs();
     this.email = new EmailUtils();
   }
 
   async create({ name, email, password }: ICreateUsers) {
-    const findUser = await this.usersRepository.findUserByEmail(email);
+    const findUser = await this.usersDALs.findUserByEmail(email);
     if (findUser) {
-      throw new Error('User already exists');
+      throw new ErrorsHelpers({
+        message: 'User already exists',
+        statusCode: 400,
+      });
     }
 
     const validateInput = createSchemaUsers.parse({ name, email, password });
     const hashPassword = await hash(validateInput.password, 10);
-    const create = await this.usersRepository.create({
+    const create = await this.usersDALs.create({
       name: validateInput.name,
       email: validateInput.email,
       password: hashPassword,
@@ -49,24 +53,37 @@ class UsersServices {
   }
 
   async auth({ email, password }: IAuthUsers) {
-    const findUser = await this.usersRepository.findUserByEmail(email);
+    const findUser = await this.usersDALs.findUserByEmail(email);
     if (!findUser) {
-      throw new Error('Invalid email or password');
+      throw new ErrorsHelpers({
+        message: 'Invalid email or password',
+        statusCode: 400,
+      });
     }
 
     const passwordMatch = await compare(password, findUser.password);
     if (!passwordMatch) {
-      throw new Error('Invalid email or password');
+      throw new ErrorsHelpers({
+        message: 'Invalid email or password',
+        statusCode: 400,
+      });
     }
 
-    let secretKey: string = env.ACCESS_KEY_TOKEN;
-    if (!secretKey) {
-      throw new Error('There is no token key');
-    }
     let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
-    if (!secretKeyRefreshToken) {
-      throw new Error('There is no token key');
+    let secretKey: string = env.ACCESS_KEY_TOKEN;
+    if (!secretKey || !secretKeyRefreshToken) {
+      throw new ErrorsHelpers({
+        message: 'There is no token key or refresh token key',
+        statusCode: 506,
+      });
     }
+
+    // if (!secretKeyRefreshToken) {
+    //   throw new ErrorsHelpers({
+    //     message: 'There is no refresh token key',
+    //     statusCode: 506,
+    //   });
+    // }
 
     const token = sign({ email }, secretKey, {
       subject: findUser.id,
@@ -89,17 +106,27 @@ class UsersServices {
 
   async refresh(refreshToken: string) {
     if (!refreshToken) {
-      throw new Error('Refresh token missing');
-    }
-    let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
-    if (!secretKeyRefreshToken) {
-      throw new Error('There is no refresh token key');
+      throw new ErrorsHelpers({
+        message: 'Refresh token missing',
+        statusCode: 400,
+      });
     }
 
+    let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
     let secretKey: string = env.ACCESS_KEY_TOKEN;
-    if (!secretKey) {
-      throw new Error('There is no token key');
+    if (!secretKey || !secretKeyRefreshToken) {
+      throw new ErrorsHelpers({
+        message: 'There is no token key or refresh token key',
+        statusCode: 506,
+      });
     }
+
+    // if (!secretKeyRefreshToken) {
+    //   throw new ErrorsHelpers({
+    //     message: 'There is no refresh token key',
+    //     statusCode: 506,
+    //   });
+    // }
 
     const verifyRefreshToken = verify(refreshToken, secretKeyRefreshToken);
 
@@ -119,14 +146,17 @@ class UsersServices {
 
   async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
     if (oldPassword && newPassword) {
-      const findUserById = await this.usersRepository.findUserById(user_id);
+      const findUserById = await this.usersDALs.findUserById(user_id);
       if (!findUserById) {
-        throw new Error('User not found');
+        throw new ErrorsHelpers({ message: 'User not found', statusCode: 404 });
       }
 
       const passwordMatch = await compare(oldPassword, findUserById.password);
       if (!passwordMatch) {
-        throw new Error('Old password invalid');
+        throw new ErrorsHelpers({
+          message: 'Old password invalid',
+          statusCode: 400,
+        });
       }
 
       const validateInput = updateSchemaUsers.parse({
@@ -136,7 +166,7 @@ class UsersServices {
         user_id,
       });
       const password = await hash(validateInput.newPassword, 10);
-      const result = await this.usersRepository.update({
+      const result = await this.usersDALs.update({
         newPassword: password,
         user_id: validateInput.user_id,
         name: validateInput.name,
@@ -147,15 +177,18 @@ class UsersServices {
         message: 'User updated successfully',
       };
     } else {
-      throw new Error('Fill in the fields correctly');
+      throw new ErrorsHelpers({
+        message: 'Fill in the fields correctly',
+        statusCode: 400,
+      });
     }
   }
 
   async forgotPassword(email: string) {
-    const findUser = await this.usersRepository.findUserByEmail(email);
+    const findUser = await this.usersDALs.findUserByEmail(email);
 
     if (!findUser) {
-      throw new Error('User not found');
+      throw new ErrorsHelpers({ message: 'User not found', statusCode: 404 });
     }
 
     const oneHours: number = 3600000;
@@ -168,7 +201,7 @@ class UsersServices {
       email: findUser.email,
     });
 
-    const token = await this.usersRepository.updateResetToken({
+    const token = await this.usersDALs.updateResetToken({
       resetToken: validateInput.resetToken,
       resetTokenExpiry: validateInput.resetTokenExpiry,
       email: validateInput.email,
@@ -181,21 +214,28 @@ class UsersServices {
     });
 
     if (!emailData) {
-      throw new Error('Error sending email');
+      throw new ErrorsHelpers({
+        message: 'Error sending email',
+        statusCode: 500,
+      });
     }
 
     return emailData;
   }
 
   async recoveryPassword({ resetToken, newPassword }: IRecoveryPassword) {
-    const findUser = await this.usersRepository.findUserByToken(resetToken);
+    const findUser = await this.usersDALs.findUserByToken(resetToken);
 
-    if (!findUser) throw new Error('Token invalid');
+    if (!findUser)
+      throw new ErrorsHelpers({
+        message: 'User by token not found',
+        statusCode: 404,
+      });
 
     const now = new Date();
 
     if (findUser.resetTokenExpiry && now > findUser.resetTokenExpiry) {
-      throw new Error('Token expired');
+      throw new ErrorsHelpers({ message: 'Token expired', statusCode: 401 });
     }
 
     const validateInput = recoveryPasswordSchemaUsers.parse({
@@ -204,7 +244,7 @@ class UsersServices {
 
     const hashedPassword = await hash(validateInput.newPassword, 10);
 
-    const result = await this.usersRepository.updatePassword({
+    const result = await this.usersDALs.updatePassword({
       newPassword: hashedPassword,
       email: findUser.email,
     });

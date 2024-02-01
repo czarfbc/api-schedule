@@ -1,17 +1,17 @@
 import { endOfDay, startOfDay } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
-import { prisma } from '../database/prisma';
+import { prisma } from '../prisma';
 import {
   ICreateSchedules,
   IFindSchedules,
   IUpdateSchedule,
-} from '../validations/interfaces/schedules.interface';
+} from '../../validations/interfaces/schedules.interface';
 import {
   createSchemaSchedules,
   updateSchemaSchedule,
-} from '../validations/z.schema/schedules.z.schema';
+} from '../../validations/z.schema/schedules.z.schema';
 
-class SchedulesRepository {
+class SchedulesDALs {
   async create({ name, phone, date, user_id, description }: ICreateSchedules) {
     const validateInput = createSchemaSchedules.parse({
       name,
@@ -126,4 +126,4 @@ class SchedulesRepository {
     return result;
   }
 }
-export { SchedulesRepository };
+export { SchedulesDALs };

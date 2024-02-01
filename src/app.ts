@@ -1,7 +1,9 @@
+import 'express-async-errors';
 import express, { Application } from 'express';
 import { UserRoutes } from './routes/users.routes';
 import { SchedulesRoutes } from './routes/schedules.routes';
 import cors, { CorsOptions } from 'cors';
+import { errorsMiddleware } from './middlewares/errors.middleware';
 
 export class App {
   private app: Application;
@@ -39,5 +41,6 @@ export class App {
     this.app.listen(port, () => {
       console.log(`Servidor rodando na porta ${port}`);
     });
+    this.app.use(errorsMiddleware);
   }
 }

@@ -1,16 +1,16 @@
-import { prisma } from '../database/prisma';
+import { prisma } from '../prisma';
 import {
   ICreateUsers,
   IUpdatePassword,
   IUpdateUsers,
   IUsersUpdateResetToken,
-} from '../validations/interfaces/users.interface';
+} from '../../validations/interfaces/users.interface';
 import {
   createSchemaUsers,
   updateSchemaUsers,
-} from '../validations/z.schema/users.z.schema';
+} from '../../validations/z.schema/users.z.schema';
 
-class UsersRepository {
+class UsersDALs {
   async create({ name, email, password }: ICreateUsers) {
     const validateInput = createSchemaUsers.parse({ name, email, password });
 
@@ -103,4 +103,4 @@ class UsersRepository {
     return result;
   }
 }
-export { UsersRepository };
+export { UsersDALs };

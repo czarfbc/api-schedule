@@ -1,20 +1,20 @@
 import { UsersServices } from '../services/users.services';
-import { UsersRepository } from '../repositories/users.repository';
+import { UsersDALs } from '../database/data.access.layer/users.dals';
 import { hash, compare } from 'bcrypt';
 import { sign, verify } from 'jsonwebtoken';
 
-jest.mock('../repositories/users.repository');
+jest.mock('../database/data.access.layer/users.dals');
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
 
 describe('UsersServices', () => {
   let usersServices: UsersServices;
-  let mockUsersRepository: jest.Mocked<UsersRepository>;
+  let mockUsersDALs: jest.Mocked<UsersDALs>;
 
   beforeEach(() => {
-    mockUsersRepository = new UsersRepository() as any;
+    mockUsersDALs = new UsersDALs() as any;
     usersServices = new UsersServices();
-    (usersServices as any).usersRepository = mockUsersRepository;
+    (usersServices as any).usersDALs = mockUsersDALs;
   });
 
   afterEach(() => {
@@ -23,7 +23,7 @@ describe('UsersServices', () => {
 
   describe('create', () => {
     it('should throw an error if email already exists', async () => {
-      mockUsersRepository.findUserByEmail.mockResolvedValueOnce({} as any);
+      mockUsersDALs.findUserByEmail.mockResolvedValueOnce({} as any);
       await expect(
         usersServices.create({
           name: 'name-test',
@@ -36,9 +36,9 @@ describe('UsersServices', () => {
     const dateCreatedAt = new Date();
     const dateUpdatedAt = new Date();
     it('should create a new user', async () => {
-      mockUsersRepository.findUserByEmail.mockResolvedValueOnce(null);
+      mockUsersDALs.findUserByEmail.mockResolvedValueOnce(null);
       (hash as jest.Mock).mockResolvedValueOnce('hashedPassword');
-      mockUsersRepository.create.mockResolvedValueOnce({
+      mockUsersDALs.create.mockResolvedValueOnce({
         id: 'uuid',
         email: 'test@test.com',
         name: 'name',
@@ -80,7 +80,7 @@ describe('UsersServices', () => {
 
   describe('auth', () => {
     it('should throw an error if invalid email', async () => {
-      mockUsersRepository.findUserByEmail.mockResolvedValueOnce(null);
+      mockUsersDALs.findUserByEmail.mockResolvedValueOnce(null);
       await expect(
         usersServices.auth({
           email: 'email@test.com',
@@ -90,7 +90,7 @@ describe('UsersServices', () => {
     });
 
     it('should throw an error if invalid password', async () => {
-      mockUsersRepository.findUserByEmail.mockResolvedValueOnce({
+      mockUsersDALs.findUserByEmail.mockResolvedValueOnce({
         password: 'hashedPassword',
       } as any);
       (hash as jest.Mock).mockResolvedValueOnce(false);
@@ -114,7 +114,7 @@ describe('UsersServices', () => {
         updatedAt: new Date(),
       };
 
-      mockUsersRepository.findUserByEmail.mockResolvedValueOnce(mockUser);
+      mockUsersDALs.findUserByEmail.mockResolvedValueOnce(mockUser);
       (compare as jest.Mock).mockResolvedValueOnce(true);
 
       const mockAccessToken = 'mockAccessToken';
@@ -194,7 +194,7 @@ describe('UsersServices', () => {
 
   describe('update', () => {
     it('should throw an error user not found', async () => {
-      mockUsersRepository.findUserById.mockResolvedValueOnce(null);
+      mockUsersDALs.findUserById.mockResolvedValueOnce(null);
       await expect(
         usersServices.update({
           user_id: 'uuid',
@@ -206,7 +206,7 @@ describe('UsersServices', () => {
     });
 
     it('should throw an error old password invalid', async () => {
-      mockUsersRepository.findUserById.mockResolvedValueOnce({} as any);
+      mockUsersDALs.findUserById.mockResolvedValueOnce({} as any);
       (compare as jest.Mock).mockResolvedValueOnce(false);
       await expect(
         usersServices.update({
@@ -221,7 +221,7 @@ describe('UsersServices', () => {
     const dateCreatedAt = new Date();
     const dateUpdatedAt = new Date();
     it('should update user', async () => {
-      mockUsersRepository.findUserById.mockResolvedValueOnce({
+      mockUsersDALs.findUserById.mockResolvedValueOnce({
         id: '5d09d3cb-c933-4975-9fea-6d99113d908f',
         email: 'test@test.com',
         password: 'hashedPassword',
@@ -235,7 +235,7 @@ describe('UsersServices', () => {
       (compare as jest.Mock).mockResolvedValueOnce(true);
       (hash as jest.Mock).mockResolvedValueOnce('hashedPassword');
 
-      mockUsersRepository.update.mockResolvedValueOnce({
+      mockUsersDALs.update.mockResolvedValueOnce({
         id: '5d09d3cb-c933-4975-9fea-6d99113d908f',
         email: 'test@test.com',
         password: 'hashedPassword',
@@ -272,7 +272,7 @@ describe('UsersServices', () => {
   describe('forgotPassword', () => {
     it('should throw an error user not found', async () => {
       const email = 'nonexistent@test.com';
-      mockUsersRepository.findUserByEmail.mockResolvedValueOnce(null);
+      mockUsersDALs.findUserByEmail.mockResolvedValueOnce(null);
       await expect(usersServices.forgotPassword(email)).rejects.toThrow(
         'User not found'
       );
@@ -281,7 +281,7 @@ describe('UsersServices', () => {
 
   describe('recoveryPassword', () => {
     it('should throw an error token invalid', async () => {
-      mockUsersRepository.findUserByToken.mockResolvedValueOnce(null as any);
+      mockUsersDALs.findUserByToken.mockResolvedValueOnce(null as any);
 
       await expect(
         usersServices.recoveryPassword({
@@ -303,13 +303,9 @@ describe('UsersServices', () => {
         updatedAt: new Date(),
       };
 
-      mockUsersRepository.findUserByToken.mockResolvedValueOnce(
-        expiredTokenUser
-      );
+      mockUsersDALs.findUserByToken.mockResolvedValueOnce(expiredTokenUser);
 
-      mockUsersRepository.findUserByToken.mockResolvedValueOnce(
-        expiredTokenUser
-      );
+      mockUsersDALs.findUserByToken.mockResolvedValueOnce(expiredTokenUser);
 
       await expect(
         usersServices.recoveryPassword({
@@ -331,7 +327,7 @@ describe('UsersServices', () => {
         updatedAt: new Date(),
       };
 
-      mockUsersRepository.findUserByToken.mockResolvedValueOnce(validTokenUser);
+      mockUsersDALs.findUserByToken.mockResolvedValueOnce(validTokenUser);
 
       const expectedUpdateResult = {
         id: 'uuid',
@@ -344,9 +340,7 @@ describe('UsersServices', () => {
         updatedAt: new Date(),
       };
 
-      (
-        usersServices as any
-      ).usersRepository.updatePassword.mockResolvedValueOnce(
+      (usersServices as any).usersDALs.updatePassword.mockResolvedValueOnce(
         Promise.resolve(expectedUpdateResult)
       );
 
