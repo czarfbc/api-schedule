@@ -4,17 +4,17 @@ import {
   ICreateUsers,
   IRecoveryPassword,
   IUpdateUsers,
-} from '../validations/interfaces/users.interface';
+} from '../validations/interfaces/services/users.interfaces';
 import { UsersDALs } from '../database/data.access.layer/users.dals';
 import { sign, verify } from 'jsonwebtoken';
 import { EmailUtils } from '../utils/email.utils';
-import { env } from '../validations/z.schema/env.z.schema';
+import { env } from '../validations/z.schemas/env.z.schemas';
 import {
   createSchemaUsers,
   recoveryPasswordSchemaUsers,
   updateResetTokenSchemaUsers,
   updateSchemaUsers,
-} from '../validations/z.schema/users.z.schema';
+} from '../validations/z.schemas/users.z.schemas';
 import { ErrorsHelpers } from '../helpers/errors.helpers';
 
 class UsersServices {

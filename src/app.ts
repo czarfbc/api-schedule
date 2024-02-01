@@ -1,23 +1,23 @@
 import 'express-async-errors';
-import express, { Application } from 'express';
+import express, { Application, NextFunction, Request, Response } from 'express';
 import { UserRoutes } from './routes/users.routes';
 import { SchedulesRoutes } from './routes/schedules.routes';
-import cors, { CorsOptions } from 'cors';
-import { errorsMiddleware } from './middlewares/errors.middleware';
+import { ErrorsMiddleware } from './middlewares/errors.middleware';
+import { TCorsMiddleware } from './validations/types/cors.types';
 
 export class App {
   private app: Application;
 
-  constructor(corsConfig?: CorsOptions) {
+  constructor(CorsConfig: TCorsMiddleware) {
     this.app = express();
-    this.middleware(corsConfig);
+    this.middleware(CorsConfig);
     this.setupUsersRoutes();
     this.setupSchedulesRoutes();
   }
 
-  private middleware(corsConfig?: CorsOptions) {
+  private middleware(CorsConfig: TCorsMiddleware) {
     this.app.use(express.json());
-    this.app.use(cors(corsConfig));
+    this.app.use(CorsConfig);
     this.app.use(express.urlencoded({ extended: true }));
   }
 
@@ -41,6 +41,6 @@ export class App {
     this.app.listen(port, () => {
       console.log(`Servidor rodando na porta ${port}`);
     });
-    this.app.use(errorsMiddleware);
+    this.app.use(ErrorsMiddleware);
   }
 }

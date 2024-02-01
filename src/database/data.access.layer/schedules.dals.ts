@@ -5,11 +5,11 @@ import {
   ICreateSchedules,
   IFindSchedules,
   IUpdateSchedule,
-} from '../../validations/interfaces/schedules.interface';
+} from '../../validations/interfaces/services/schedules.interfaces';
 import {
   createSchemaSchedules,
   updateSchemaSchedule,
-} from '../../validations/z.schema/schedules.z.schema';
+} from '../../validations/z.schemas/schedules.z.schemas';
 
 class SchedulesDALs {
   async create({ name, phone, date, user_id, description }: ICreateSchedules) {

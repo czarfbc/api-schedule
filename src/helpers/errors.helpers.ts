@@ -1,7 +1,4 @@
-interface IErrorsHelpers {
-  message: string;
-  statusCode: number;
-}
+import { IErrorsHelpers } from '../validations/interfaces/helpers/errors.interfaces';
 
 class ErrorsHelpers extends Error {
   public readonly statusCode: number;
