@@ -4,11 +4,11 @@ import {
   IUpdatePassword,
   IUpdateUsers,
   IUsersUpdateResetToken,
-} from '../../validations/interfaces/users.interface';
+} from '../../validations/interfaces/services/users.interfaces';
 import {
   createSchemaUsers,
   updateSchemaUsers,
-} from '../../validations/z.schema/users.z.schema';
+} from '../../validations/z.schemas/users.z.schemas';
 
 class UsersDALs {
   async create({ name, email, password }: ICreateUsers) {

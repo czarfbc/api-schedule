@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { ErrorsHelpers } from '../helpers/errors.helpers';
 
-export const errorsMiddleware = (
+export const ErrorsMiddleware = (
   error: Error & Partial<ErrorsHelpers>,
   request: Request,
   response: Response,
