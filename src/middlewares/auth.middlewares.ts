@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
-import { IPayload } from '../interfaces/users.interface';
+import { IPayload } from '../validations/interfaces/services/users.interfaces';
+import { env } from '../validations/z.schemas/env.z.schemas';
 
 class AuthMiddleware {
   auth(request: Request, response: Response, next: NextFunction) {
@@ -13,7 +14,7 @@ class AuthMiddleware {
     }
     const [, token] = authHeader.split(' ');
 
-    let secretkey: string | undefined = process.env.ACCESS_KEY_TOKEN;
+    let secretkey: string = env.ACCESS_KEY_TOKEN;
     if (!secretkey) {
       throw new Error('Não há chave de token');
     }

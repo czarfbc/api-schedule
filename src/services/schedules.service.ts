@@ -1,96 +1,116 @@
-import { ICreate } from '../interfaces/schedules.interface';
+import {
+  ICreateSchedules,
+  IFindSchedules,
+  IUpdateSchedule,
+} from '../validations/interfaces/services/schedules.interfaces';
 import { isBefore, startOfMinute } from 'date-fns';
-import { SchedulesRepository } from '../repositories/schedules.repository';
+import { SchedulesDALs } from '../database/data.access.layer/schedules.dals';
+import {
+  createSchemaSchedules,
+  updateSchemaSchedule,
+} from '../validations/z.schemas/schedules.z.schemas';
 
 class SchedulesService {
-  private schedulesRepository: SchedulesRepository;
+  private schedulesDALs: SchedulesDALs;
   constructor() {
-    this.schedulesRepository = new SchedulesRepository();
+    this.schedulesDALs = new SchedulesDALs();
   }
-  async create({ name, phone, date, user_id, description }: ICreate) {
-    const dateFormatted = new Date(date);
 
+  async create({ name, phone, date, user_id, description }: ICreateSchedules) {
+    const validateInput = createSchemaSchedules.parse({
+      name,
+      phone,
+      date,
+      user_id,
+      description,
+    });
+
+    const dateFormatted = new Date(validateInput.date);
     const minuteStart = startOfMinute(dateFormatted);
 
     if (isBefore(minuteStart, new Date())) {
-      throw new Error('Não é permitido agendar data antiga');
+      throw new Error('It is not allowed to schedule an old date');
     }
 
     const checkIsAvailable =
-      await this.schedulesRepository.findIfVerificationIsAvailable(
-        minuteStart,
-        user_id
-      );
+      await this.schedulesDALs.findIfVerificationIsAvailable({
+        date: minuteStart,
+        user_id: validateInput.user_id,
+      });
 
     if (checkIsAvailable) {
-      throw new Error('A data agendada não está disponível');
+      throw new Error('The scheduled date is not available');
     }
 
-    const create = await this.schedulesRepository.create({
-      name,
-      phone,
+    const create = await this.schedulesDALs.create({
+      name: validateInput.name,
+      phone: validateInput.phone,
       date: minuteStart,
-      user_id,
-      description,
+      user_id: validateInput.user_id,
+      description: validateInput.description,
     });
     return create;
   }
 
-  async findEverythingOfTheDay(date: Date, user_id: string) {
-    const result = await this.schedulesRepository.findEverythingOfTheDay(
+  async findEverythingOfTheDay({ date, user_id }: IFindSchedules) {
+    const result = await this.schedulesDALs.findEverythingOfTheDay({
       date,
-      user_id
-    );
+      user_id,
+    });
 
     return result;
   }
 
   async findAll(user_id: string) {
-    const result = await this.schedulesRepository.findAll(user_id);
+    const result = await this.schedulesDALs.findAll(user_id);
 
     return result;
   }
 
-  async update(
-    id: string,
-    date: Date,
-    user_id: string,
-    phone: string,
-    description: string
-  ) {
-    const dateFormatted = new Date(date);
-
-    const minuteStart = startOfMinute(dateFormatted);
-
-    if (isBefore(minuteStart, new Date())) {
-      throw new Error('Não é permitido agendar data antiga');
-    }
-
-    const checkIsAvailable =
-      await this.schedulesRepository.findIfVerificationIsAvailable(
-        minuteStart,
-        user_id
-      );
-
-    if (checkIsAvailable) {
-      throw new Error('A data agendada não está disponível');
-    }
-
-    const result = await this.schedulesRepository.update(
+  async update({ id, date, user_id, phone, description }: IUpdateSchedule) {
+    const validateInput = updateSchemaSchedule.parse({
       id,
       date,
       phone,
-      description
-    );
+      description,
+      user_id,
+    });
+
+    const dateFormatted = new Date(validateInput.date);
+    const minuteStart = startOfMinute(dateFormatted);
+
+    if (isBefore(minuteStart, new Date())) {
+      throw new Error('It is not allowed to schedule an old date');
+    }
+
+    if (!user_id) {
+      throw new Error('User not found');
+    }
+    const checkIsAvailable =
+      await this.schedulesDALs.findIfVerificationIsAvailable({
+        date: minuteStart,
+        user_id: validateInput.user_id,
+      });
+
+    if (checkIsAvailable) {
+      throw new Error('The scheduled date is not available');
+    }
+
+    const result = await this.schedulesDALs.update({
+      id: validateInput.id,
+      date: validateInput.date,
+      phone: validateInput.phone,
+      description: validateInput.description,
+    });
     return result;
   }
 
   async delete(id: string) {
-    await this.schedulesRepository.delete(id);
+    await this.schedulesDALs.delete(id);
   }
 
   async deleteOldSchedules(user_id: string) {
-    const result = await this.schedulesRepository.deleteOldSchedules(user_id);
+    const result = await this.schedulesDALs.deleteOldSchedules(user_id);
 
     return result;
   }

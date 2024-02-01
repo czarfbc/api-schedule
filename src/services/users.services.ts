@@ -1,23 +1,47 @@
 import { compare, hash } from 'bcrypt';
-import { ICreate, IUpdate } from '../interfaces/users.interface';
-import { UsersRepository } from '../repositories/users.repository';
+import {
+  IAuthUsers,
+  ICreateUsers,
+  IRecoveryPassword,
+  IUpdateUsers,
+} from '../validations/interfaces/services/users.interfaces';
+import { UsersDALs } from '../database/data.access.layer/users.dals';
 import { sign, verify } from 'jsonwebtoken';
-import { Email } from '../utils/email';
+import { EmailUtils } from '../utils/email.utils';
+import { env } from '../validations/z.schemas/env.z.schemas';
+import {
+  createSchemaUsers,
+  recoveryPasswordSchemaUsers,
+  updateResetTokenSchemaUsers,
+  updateSchemaUsers,
+} from '../validations/z.schemas/users.z.schemas';
+import { ErrorsHelpers } from '../helpers/errors.helpers';
 
 class UsersServices {
-  private usersRepository: UsersRepository;
-  private email: Email;
+  private usersDALs: UsersDALs;
+  private email: EmailUtils;
 
   constructor() {
-    this.usersRepository = new UsersRepository();
-    this.email = new Email();
+    this.usersDALs = new UsersDALs();
+    this.email = new EmailUtils();
   }
 
-  async create({ name, email, password }: ICreate) {
-    const findUser = await this.usersRepository.findUserByEmail(email);
+  async create({ name, email, password }: ICreateUsers) {
+    const findUser = await this.usersDALs.findUserByEmail(email);
     if (findUser) {
-      throw new Error('Usuário já existe');
+      throw new ErrorsHelpers({
+        message: 'User already exists',
+        statusCode: 400,
+      });
     }
+
+    const validateInput = createSchemaUsers.parse({ name, email, password });
+    const hashPassword = await hash(validateInput.password, 10);
+    const create = await this.usersDALs.create({
+      name: validateInput.name,
+      email: validateInput.email,
+      password: hashPassword,
+    });
 
     const emailData = await this.email.sendEmail({
       inviteTo: email,
@@ -25,65 +49,41 @@ class UsersServices {
       html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
     });
 
-    const hashPassword = await hash(password, 10);
-    const create = await this.usersRepository.create({
-      name,
-      email,
-      password: hashPassword,
-    });
-
     return { create, emailData };
   }
 
-  async update({ oldPassword, newPassword, user_id, name }: IUpdate) {
-    if (oldPassword && newPassword) {
-      const findUserById = await this.usersRepository.findUserById(user_id);
-      if (!findUserById) {
-        throw new Error('Usuário não encontrado');
-      }
-
-      const passwordMatch = await compare(oldPassword, findUserById.password);
-      if (!passwordMatch) {
-        throw new Error('Senha inválida');
-      }
-
-      const password = await hash(newPassword, 10);
-
-      const result = await this.usersRepository.update({
-        newPassword: password,
-        user_id,
-        name,
-      });
-
-      return {
-        result,
-        message: 'Usuário atualizado com sucesso',
-      };
-    } else {
-      throw new Error('Preencha os campos corretamente');
-    }
-  }
-
-  async auth(email: string, password: string) {
-    const findUser = await this.usersRepository.findUserByEmail(email);
+  async auth({ email, password }: IAuthUsers) {
+    const findUser = await this.usersDALs.findUserByEmail(email);
     if (!findUser) {
-      throw new Error('Usuário ou senha invalido');
+      throw new ErrorsHelpers({
+        message: 'Invalid email or password',
+        statusCode: 400,
+      });
     }
 
     const passwordMatch = await compare(password, findUser.password);
     if (!passwordMatch) {
-      throw new Error('Usuário ou senha invalido');
+      throw new ErrorsHelpers({
+        message: 'Invalid email or password',
+        statusCode: 400,
+      });
     }
 
-    let secretKey: string | undefined = process.env.ACCESS_KEY_TOKEN;
-    if (!secretKey) {
-      throw new Error('Não há chave de token');
+    let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
+    let secretKey: string = env.ACCESS_KEY_TOKEN;
+    if (!secretKey || !secretKeyRefreshToken) {
+      throw new ErrorsHelpers({
+        message: 'There is no token key or refresh token key',
+        statusCode: 506,
+      });
     }
-    let secretKeyRefreshToken: string | undefined =
-      process.env.ACCESS_KEY_TOKEN_REFRESH;
-    if (!secretKeyRefreshToken) {
-      throw new Error('Não há chave de token');
-    }
+
+    // if (!secretKeyRefreshToken) {
+    //   throw new ErrorsHelpers({
+    //     message: 'There is no refresh token key',
+    //     statusCode: 506,
+    //   });
+    // }
 
     const token = sign({ email }, secretKey, {
       subject: findUser.id,
@@ -95,8 +95,8 @@ class UsersServices {
     });
 
     return {
-      token,
-      refresh_token: refreshToken,
+      token: { token, expiresIn: '60s' },
+      refreshToken: { refreshToken, expiresIn: '7d' },
       user: {
         name: findUser.name,
         email: findUser.email,
@@ -104,32 +104,151 @@ class UsersServices {
     };
   }
 
-  async refresh(refresh_token: string) {
-    if (!refresh_token) {
-      throw new Error('Refresh token ausente');
-    }
-    let secretKeyRefreshToken: string | undefined =
-      process.env.ACCESS_KEY_TOKEN_REFRESH;
-    if (!secretKeyRefreshToken) {
-      throw new Error('Não há chave de refresh token');
+  async refresh(refreshToken: string) {
+    if (!refreshToken) {
+      throw new ErrorsHelpers({
+        message: 'Refresh token missing',
+        statusCode: 400,
+      });
     }
 
-    let secretKey: string | undefined = process.env.ACCESS_KEY_TOKEN;
-    if (!secretKey) {
-      throw new Error('Não há chave de refresh token');
+    let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
+    let secretKey: string = env.ACCESS_KEY_TOKEN;
+    if (!secretKey || !secretKeyRefreshToken) {
+      throw new ErrorsHelpers({
+        message: 'There is no token key or refresh token key',
+        statusCode: 506,
+      });
     }
 
-    const verifyRefreshToken = verify(refresh_token, secretKeyRefreshToken);
+    // if (!secretKeyRefreshToken) {
+    //   throw new ErrorsHelpers({
+    //     message: 'There is no refresh token key',
+    //     statusCode: 506,
+    //   });
+    // }
+
+    const verifyRefreshToken = verify(refreshToken, secretKeyRefreshToken);
 
     const { sub } = verifyRefreshToken;
 
     const newToken = sign({ sub }, secretKey, {
       expiresIn: '1h',
     });
-    const refreshToken = sign({ sub }, secretKeyRefreshToken, {
+    const newRefreshToken = sign({ sub }, secretKeyRefreshToken, {
       expiresIn: '7d',
     });
-    return { token: newToken, refresh_token: refreshToken };
+    return {
+      token: { token: newToken, expiresIn: '1h' },
+      refreshToken: { refreshToken: newRefreshToken, expiresIn: '7d' },
+    };
+  }
+
+  async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
+    if (oldPassword && newPassword) {
+      const findUserById = await this.usersDALs.findUserById(user_id);
+      if (!findUserById) {
+        throw new ErrorsHelpers({ message: 'User not found', statusCode: 404 });
+      }
+
+      const passwordMatch = await compare(oldPassword, findUserById.password);
+      if (!passwordMatch) {
+        throw new ErrorsHelpers({
+          message: 'Old password invalid',
+          statusCode: 400,
+        });
+      }
+
+      const validateInput = updateSchemaUsers.parse({
+        name,
+        oldPassword,
+        newPassword,
+        user_id,
+      });
+      const password = await hash(validateInput.newPassword, 10);
+      const result = await this.usersDALs.update({
+        newPassword: password,
+        user_id: validateInput.user_id,
+        name: validateInput.name,
+      });
+
+      return {
+        result,
+        message: 'User updated successfully',
+      };
+    } else {
+      throw new ErrorsHelpers({
+        message: 'Fill in the fields correctly',
+        statusCode: 400,
+      });
+    }
+  }
+
+  async forgotPassword(email: string) {
+    const findUser = await this.usersDALs.findUserByEmail(email);
+
+    if (!findUser) {
+      throw new ErrorsHelpers({ message: 'User not found', statusCode: 404 });
+    }
+
+    const oneHours: number = 3600000;
+    const resetToken = await hash(findUser.email + Date.now(), 10);
+    const resetTokenExpiry = new Date(Date.now() + oneHours);
+
+    const validateInput = updateResetTokenSchemaUsers.parse({
+      resetToken,
+      resetTokenExpiry,
+      email: findUser.email,
+    });
+
+    const token = await this.usersDALs.updateResetToken({
+      resetToken: validateInput.resetToken,
+      resetTokenExpiry: validateInput.resetTokenExpiry,
+      email: validateInput.email,
+    });
+
+    const emailData = await this.email.sendEmail({
+      inviteTo: email,
+      subject: 'Recuperação de Senha!!!',
+      html: `"<p>codigo para recuperar senha <h1>${token.resetToken}</h1></p>`,
+    });
+
+    if (!emailData) {
+      throw new ErrorsHelpers({
+        message: 'Error sending email',
+        statusCode: 500,
+      });
+    }
+
+    return emailData;
+  }
+
+  async recoveryPassword({ resetToken, newPassword }: IRecoveryPassword) {
+    const findUser = await this.usersDALs.findUserByToken(resetToken);
+
+    if (!findUser)
+      throw new ErrorsHelpers({
+        message: 'User by token not found',
+        statusCode: 404,
+      });
+
+    const now = new Date();
+
+    if (findUser.resetTokenExpiry && now > findUser.resetTokenExpiry) {
+      throw new ErrorsHelpers({ message: 'Token expired', statusCode: 401 });
+    }
+
+    const validateInput = recoveryPasswordSchemaUsers.parse({
+      newPassword,
+    });
+
+    const hashedPassword = await hash(validateInput.newPassword, 10);
+
+    const result = await this.usersDALs.updatePassword({
+      newPassword: hashedPassword,
+      email: findUser.email,
+    });
+    return result;
   }
 }
 export { UsersServices };

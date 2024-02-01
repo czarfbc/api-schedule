@@ -1,13 +1,9 @@
 import { App } from './app';
+import { CorsConfig } from './middlewares/cors.middlewares';
+import { env } from './validations/z.schemas/env.z.schemas';
 
-const corsConfig = {
-  origin: 'http://localhost:3003',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  optionsSuccessStatus: 204,
-};
+const PORT = env.PORT;
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3003;
-
-const app = new App(corsConfig);
+const app = new App(CorsConfig);
 
 app.listen(PORT);

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { UsersController } from '../controllers/users.cotroller';
-import { AuthMiddleware } from '../middlewares/auth';
+import { AuthMiddleware } from '../middlewares/auth.middlewares';
 class UserRoutes {
   private router: Router;
   private usersController: UsersController;
@@ -36,6 +36,16 @@ class UserRoutes {
       '/update',
       this.authMiddleware.auth.bind(this.authMiddleware),
       this.usersController.update.bind(this.usersController)
+    );
+
+    this.router.patch(
+      '/forgotPassword',
+      this.usersController.forgotPassword.bind(this.usersController)
+    );
+
+    this.router.patch(
+      '/updatePassword',
+      this.usersController.recoveryPassword.bind(this.usersController)
     );
 
     return this.router;
