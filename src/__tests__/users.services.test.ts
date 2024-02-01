@@ -280,7 +280,7 @@ describe('UsersServices', () => {
   });
 
   describe('recoveryPassword', () => {
-    it('should throw an error token invalid', async () => {
+    it('should throw an error User by token not found', async () => {
       mockUsersDALs.findUserByToken.mockResolvedValueOnce(null as any);
 
       await expect(
@@ -288,7 +288,7 @@ describe('UsersServices', () => {
           resetToken: 'invalidToken',
           newPassword: 'newPassword',
         })
-      ).rejects.toThrow('Token invalid');
+      ).rejects.toThrow('User by token not found');
     });
 
     it('should throw an error token expired', async () => {
