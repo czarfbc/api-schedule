@@ -49,6 +49,7 @@ class SchedulesService {
       user_id: validateInput.user_id,
       description: validateInput.description,
     });
+
     return create;
   }
 
