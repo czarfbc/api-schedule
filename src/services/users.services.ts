@@ -78,13 +78,6 @@ class UsersServices {
       });
     }
 
-    // if (!secretKeyRefreshToken) {
-    //   throw new ErrorsHelpers({
-    //     message: 'There is no refresh token key',
-    //     statusCode: 506,
-    //   });
-    // }
-
     const token = sign({ email }, secretKey, {
       subject: findUser.id,
       expiresIn: '60s',
@@ -120,13 +113,6 @@ class UsersServices {
         statusCode: 506,
       });
     }
-
-    // if (!secretKeyRefreshToken) {
-    //   throw new ErrorsHelpers({
-    //     message: 'There is no refresh token key',
-    //     statusCode: 506,
-    //   });
-    // }
 
     const verifyRefreshToken = verify(refreshToken, secretKeyRefreshToken);
 

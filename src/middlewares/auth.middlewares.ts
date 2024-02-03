@@ -16,7 +16,7 @@ class AuthMiddlewares {
 
     let secretkey: string = env.ACCESS_KEY_TOKEN;
     if (!secretkey) {
-      throw new Error('Não há chave de token');
+      throw new Error('There is no token key');
     }
 
     try {

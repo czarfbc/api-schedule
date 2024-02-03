@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-//USADO
 export const createSchemaUsers = z.object({
   name: z
     .string()
@@ -11,7 +10,6 @@ export const createSchemaUsers = z.object({
     .min(8, { message: 'Password must be at least 8 characters long' }),
 });
 
-//USADO
 export const updateSchemaUsers = z.object({
   name: z
     .string()
@@ -26,14 +24,12 @@ export const updateSchemaUsers = z.object({
   user_id: z.string().uuid(),
 });
 
-//USADO
 export const updateResetTokenSchemaUsers = z.object({
   resetToken: z.string(),
   resetTokenExpiry: z.coerce.date(),
   email: z.string().email({ message: 'Invalid email' }),
 });
 
-//USADO
 export const recoveryPasswordSchemaUsers = z.object({
   newPassword: z
     .string()
