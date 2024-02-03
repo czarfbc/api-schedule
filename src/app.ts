@@ -2,23 +2,29 @@ import 'express-async-errors';
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { UserRoutes } from './routes/users.routes';
 import { SchedulesRoutes } from './routes/schedules.routes';
-import { ErrorsMiddleware } from './middlewares/errors.middleware';
-import { TCorsMiddleware } from './validations/types/cors.types';
+import { ErrorsMiddlewares } from './middlewares/errors.middleware';
+import cors, { CorsOptions } from 'cors';
 
 export class App {
   private app: Application;
+  private errorsMiddlewares: ErrorsMiddlewares;
 
-  constructor(CorsConfig: TCorsMiddleware) {
+  constructor(corsConfig: CorsOptions) {
     this.app = express();
-    this.middleware(CorsConfig);
-    this.setupUsersRoutes();
-    this.setupSchedulesRoutes();
+    this.errorsMiddlewares = new ErrorsMiddlewares();
+    this.middleware(corsConfig);
+    this.setupAllRoutes();
   }
 
-  private middleware(CorsConfig: TCorsMiddleware) {
+  private middleware(corsConfig: CorsOptions) {
     this.app.use(express.json());
-    this.app.use(CorsConfig);
+    this.app.use(cors(corsConfig));
     this.app.use(express.urlencoded({ extended: true }));
+  }
+
+  private setupAllRoutes() {
+    this.setupUsersRoutes();
+    this.setupSchedulesRoutes();
   }
 
   private setupUsersRoutes() {
@@ -41,6 +47,8 @@ export class App {
     this.app.listen(port, () => {
       console.log(`Servidor rodando na porta ${port}`);
     });
-    this.app.use(ErrorsMiddleware);
+    this.app.use(
+      this.errorsMiddlewares.handleError.bind(this.errorsMiddlewares)
+    );
   }
 }

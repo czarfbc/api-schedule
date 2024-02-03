@@ -103,6 +103,7 @@ class SchedulesService {
       phone: validateInput.phone,
       description: validateInput.description,
     });
+
     return result;
   }
 
@@ -116,4 +117,5 @@ class SchedulesService {
     return result;
   }
 }
+
 export { SchedulesService };

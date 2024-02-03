@@ -3,7 +3,7 @@ import { verify } from 'jsonwebtoken';
 import { IPayload } from '../validations/interfaces/services/users.interfaces';
 import { env } from '../validations/z.schemas/env.z.schemas';
 
-class AuthMiddleware {
+class AuthMiddlewares {
   auth(request: Request, response: Response, next: NextFunction) {
     const authHeader = request.headers.authorization;
     if (!authHeader) {
@@ -16,7 +16,7 @@ class AuthMiddleware {
 
     let secretkey: string = env.ACCESS_KEY_TOKEN;
     if (!secretkey) {
-      throw new Error('Não há chave de token');
+      throw new Error('There is no token key');
     }
 
     try {
@@ -32,4 +32,4 @@ class AuthMiddleware {
   }
 }
 
-export { AuthMiddleware };
+export { AuthMiddlewares };
