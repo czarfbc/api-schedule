@@ -3,7 +3,7 @@ import { verify } from 'jsonwebtoken';
 import { IPayload } from '../validations/interfaces/services/users.interfaces';
 import { env } from '../validations/z.schemas/env.z.schemas';
 
-class AuthMiddleware {
+class AuthMiddlewares {
   auth(request: Request, response: Response, next: NextFunction) {
     const authHeader = request.headers.authorization;
     if (!authHeader) {
@@ -32,4 +32,4 @@ class AuthMiddleware {
   }
 }
 
-export { AuthMiddleware };
+export { AuthMiddlewares };
