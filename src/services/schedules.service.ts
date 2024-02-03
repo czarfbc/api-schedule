@@ -117,4 +117,5 @@ class SchedulesService {
     return result;
   }
 }
+
 export { SchedulesService };
