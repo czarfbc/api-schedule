@@ -3,22 +3,22 @@ import express, { Application, NextFunction, Request, Response } from 'express';
 import { UserRoutes } from './routes/users.routes';
 import { SchedulesRoutes } from './routes/schedules.routes';
 import { ErrorsMiddlewares } from './middlewares/errors.middleware';
-import cors from 'cors';
+import cors, { CorsOptions } from 'cors';
 
 export class App {
   private app: Application;
   private errorsMiddlewares: ErrorsMiddlewares;
 
-  constructor() {
+  constructor(corsConfig: CorsOptions) {
     this.app = express();
     this.errorsMiddlewares = new ErrorsMiddlewares();
-    this.middleware();
+    this.middleware(corsConfig);
     this.setupAllRoutes();
   }
 
-  private middleware() {
+  private middleware(corsConfig: CorsOptions) {
     this.app.use(express.json());
-    this.app.use(cors());
+    this.app.use(cors(corsConfig));
     this.app.use(express.urlencoded({ extended: true }));
   }
 
