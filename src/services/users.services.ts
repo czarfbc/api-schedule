@@ -4,6 +4,7 @@ import {
   ICreateUsers,
   IRecoveryPassword,
   IUpdateUsers,
+  IForgotPassword,
 } from '../validations/interfaces/services/users.interfaces';
 import { UsersDALs } from '../database/data.access.layer/users.dals';
 import { sign, verify } from 'jsonwebtoken';
@@ -17,14 +18,19 @@ import {
   authSchemaUsers,
 } from '../validations/z.schemas/users.z.schemas';
 import { ErrorsHelpers } from '../helpers/errors.helpers';
+import { RequestRateLimitUtils } from '../utils/request.rate.limit';
 
 class UsersServices {
   private usersDALs: UsersDALs;
   private email: EmailUtils;
+  private requestRateLimit: RequestRateLimitUtils;
+  private invalidAttempts: Map<string, number>;
 
   constructor() {
     this.usersDALs = new UsersDALs();
     this.email = new EmailUtils();
+    this.requestRateLimit = new RequestRateLimitUtils();
+    this.invalidAttempts = new Map();
   }
 
   async create({ name, email, password }: ICreateUsers) {
@@ -49,6 +55,13 @@ class UsersServices {
       subject: 'Bem Vindo!!!',
       html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
     });
+
+    if (!emailData) {
+      throw new ErrorsHelpers({
+        message: 'Error sending email',
+        statusCode: 500,
+      });
+    }
 
     return { create, emailData };
   }
@@ -175,10 +188,24 @@ class UsersServices {
     }
   }
 
-  async forgotPassword(email: string) {
+  async forgotPassword({ email, ip }: IForgotPassword) {
+    if (ip === undefined) {
+      throw new ErrorsHelpers({ message: 'Cannot find ip', statusCode: 404 });
+    }
+    if (this.requestRateLimit.checkIfTheIpIsBlocked(ip)) {
+      throw new ErrorsHelpers({
+        message: 'Too many requests. This IP has been blocked for 15 minutes',
+        statusCode: 429,
+      });
+    }
+
     const findUser = await this.usersDALs.findUserByEmail(email);
 
     if (!findUser) {
+      const attempts = this.invalidAttempts.get(ip) || 0;
+      this.invalidAttempts.set(ip, attempts + 1);
+      if (attempts + 1 === 3) this.requestRateLimit.blockedIP(ip);
+
       throw new ErrorsHelpers({ message: 'User not found', statusCode: 404 });
     }
 

@@ -51,8 +51,9 @@ class UsersController {
     next: NextFunction
   ) {
     const { email } = request.body;
+    const ip = request.clientIp;
 
-    const result = await this.usersServices.forgotPassword(email);
+    const result = await this.usersServices.forgotPassword({ email, ip });
 
     return response.status(200).json(result);
   }

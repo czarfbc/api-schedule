@@ -35,3 +35,7 @@ export interface IUpdatePassword {
 export interface IPayload {
   sub: string;
 }
+export interface IForgotPassword {
+  email: string;
+  ip: string | undefined;
+}
