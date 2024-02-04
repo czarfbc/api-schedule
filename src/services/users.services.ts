@@ -56,6 +56,13 @@ class UsersServices {
       html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
     });
 
+    if (!emailData) {
+      throw new ErrorsHelpers({
+        message: 'Error sending email',
+        statusCode: 500,
+      });
+    }
+
     return { create, emailData };
   }
 

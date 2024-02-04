@@ -272,8 +272,9 @@ describe('UsersServices', () => {
   describe('forgotPassword', () => {
     it('should throw an error user not found', async () => {
       const email = 'nonexistent@test.com';
+      const ip = '';
       mockUsersDALs.findUserByEmail.mockResolvedValueOnce(null);
-      await expect(usersServices.forgotPassword(email)).rejects.toThrow(
+      await expect(usersServices.forgotPassword({ email, ip })).rejects.toThrow(
         'User not found'
       );
     });
