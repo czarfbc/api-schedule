@@ -10,6 +10,13 @@ export const createSchemaUsers = z.object({
     .min(8, { message: 'Password must be at least 8 characters long' }),
 });
 
+export const authSchemaUsers = z.object({
+  email: z.string().email({ message: 'Invalid email' }),
+  password: z
+    .string()
+    .min(8, { message: 'Password must be at least 8 characters long' }),
+});
+
 export const updateSchemaUsers = z.object({
   name: z
     .string()

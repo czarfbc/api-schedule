@@ -14,6 +14,7 @@ import {
   recoveryPasswordSchemaUsers,
   updateResetTokenSchemaUsers,
   updateSchemaUsers,
+  authSchemaUsers,
 } from '../validations/z.schemas/users.z.schemas';
 import { ErrorsHelpers } from '../helpers/errors.helpers';
 
@@ -53,7 +54,8 @@ class UsersServices {
   }
 
   async auth({ email, password }: IAuthUsers) {
-    const findUser = await this.usersDALs.findUserByEmail(email);
+    const validateInput = authSchemaUsers.parse({ email, password });
+    const findUser = await this.usersDALs.findUserByEmail(validateInput.email);
     if (!findUser) {
       throw new ErrorsHelpers({
         message: 'Invalid email or password',
@@ -61,7 +63,10 @@ class UsersServices {
       });
     }
 
-    const passwordMatch = await compare(password, findUser.password);
+    const passwordMatch = await compare(
+      validateInput.password,
+      findUser.password
+    );
     if (!passwordMatch) {
       throw new ErrorsHelpers({
         message: 'Invalid email or password',

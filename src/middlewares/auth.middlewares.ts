@@ -4,7 +4,7 @@ import { IPayload } from '../validations/interfaces/services/users.interfaces';
 import { env } from '../validations/z.schemas/env.z.schemas';
 
 class AuthMiddlewares {
-  auth(request: Request, response: Response, next: NextFunction) {
+  handleAuth(request: Request, response: Response, next: NextFunction) {
     const authHeader = request.headers.authorization;
     if (!authHeader) {
       return response.status(401).json({

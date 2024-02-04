@@ -1,7 +1,7 @@
 import { CorsOptions } from 'cors';
 
 class CorsMiddlewares {
-  private static corsConfig: CorsOptions = {
+  private corsConfig: CorsOptions = {
     origin: 'http://localhost:3003',
     methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS,HEAD',
     optionsSuccessStatus: 204,
@@ -9,7 +9,7 @@ class CorsMiddlewares {
     maxAge: 600,
   };
 
-  public static getCorsConfig(): CorsOptions {
+  handleCors(): CorsOptions {
     return this.corsConfig;
   }
 }

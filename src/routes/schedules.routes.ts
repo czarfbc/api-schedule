@@ -16,7 +16,7 @@ class SchedulesRoutes {
   postRoutes() {
     this.router.post(
       '/create',
-      this.authMiddlewares.auth.bind(this.authMiddlewares),
+      this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
       this.schedulesController.create.bind(this.schedulesController)
     );
 
@@ -26,7 +26,7 @@ class SchedulesRoutes {
   getRoutes() {
     this.router.get(
       '/getofday',
-      this.authMiddlewares.auth.bind(this.authMiddlewares),
+      this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
       this.schedulesController.findEverythingOfTheDay.bind(
         this.schedulesController
       )
@@ -34,7 +34,7 @@ class SchedulesRoutes {
 
     this.router.get(
       '/getall',
-      this.authMiddlewares.auth.bind(this.authMiddlewares),
+      this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
       this.schedulesController.findEverythingOfTheDay.bind(
         this.schedulesController
       )
@@ -46,7 +46,7 @@ class SchedulesRoutes {
   patchRoutes() {
     this.router.patch(
       '/patch/:id',
-      this.authMiddlewares.auth.bind(this.authMiddlewares),
+      this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
       this.schedulesController.update.bind(this.schedulesController)
     );
 
@@ -56,13 +56,13 @@ class SchedulesRoutes {
   deleteRoutes() {
     this.router.delete(
       '/deleteoldschedules',
-      this.authMiddlewares.auth.bind(this.authMiddlewares),
+      this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
       this.schedulesController.deleteOldSchedules.bind(this.schedulesController)
     );
 
     this.router.delete(
       '/delete/:id',
-      this.authMiddlewares.auth.bind(this.authMiddlewares),
+      this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
       this.schedulesController.delete.bind(this.schedulesController)
     );
 

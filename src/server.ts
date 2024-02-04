@@ -4,6 +4,8 @@ import { env } from './validations/z.schemas/env.z.schemas';
 
 const PORT = env.PORT;
 
-const app = new App(CorsMiddlewares.getCorsConfig());
+const corsMiddlewares = new CorsMiddlewares();
+
+const app = new App(corsMiddlewares.handleCors());
 
 app.listen(PORT);

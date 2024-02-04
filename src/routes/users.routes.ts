@@ -34,7 +34,7 @@ class UserRoutes {
   patchRoutes() {
     this.router.patch(
       '/update',
-      this.authMiddlewares.auth.bind(this.authMiddlewares),
+      this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
       this.usersController.update.bind(this.usersController)
     );
 
