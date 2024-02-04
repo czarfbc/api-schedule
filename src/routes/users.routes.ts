@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import { UsersController } from '../controllers/users.cotroller';
-import { AuthMiddleware } from '../middlewares/auth.middlewares';
+import { AuthMiddlewares } from '../middlewares/auth.middlewares';
 class UserRoutes {
   private router: Router;
   private usersController: UsersController;
-  private authMiddleware: AuthMiddleware;
+  private authMiddlewares: AuthMiddlewares;
 
   constructor() {
     this.router = Router();
     this.usersController = new UsersController();
-    this.authMiddleware = new AuthMiddleware();
+    this.authMiddlewares = new AuthMiddlewares();
   }
 
   postRoutes() {
@@ -34,7 +34,7 @@ class UserRoutes {
   patchRoutes() {
     this.router.patch(
       '/update',
-      this.authMiddleware.auth.bind(this.authMiddleware),
+      this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
       this.usersController.update.bind(this.usersController)
     );
 

@@ -1,9 +1,11 @@
 import { App } from './app';
-import { CorsConfig } from './middlewares/cors.middlewares';
+import { CorsMiddlewares } from './middlewares/cors.middlewares';
 import { env } from './validations/z.schemas/env.z.schemas';
 
 const PORT = env.PORT;
 
-const app = new App(CorsConfig);
+const corsMiddlewares = new CorsMiddlewares();
+
+const app = new App(corsMiddlewares.handleCors());
 
 app.listen(PORT);

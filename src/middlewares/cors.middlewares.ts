@@ -1,23 +1,17 @@
-import { TCorsMiddleware } from '../validations/types/cors.types';
+import { CorsOptions } from 'cors';
 
-export const CorsConfig: TCorsMiddleware = (req, res, next) => {
-  const allowedOrigins = [
-    'https://eat-eating-web-app.vercel.app',
-    'http://localhost:3000',
-  ];
-  const origin = req.headers.origin;
+class CorsMiddlewares {
+  private corsConfig: CorsOptions = {
+    origin: 'http://localhost:3003',
+    methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS,HEAD',
+    optionsSuccessStatus: 204,
+    credentials: true,
+    maxAge: 600,
+  };
 
-  if (allowedOrigins.includes(origin || '')) {
-    res.header('Access-Control-Allow-Origin', origin);
+  handleCors(): CorsOptions {
+    return this.corsConfig;
   }
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  res.header(
-    'Access-Control-Allow-Methods',
-    'GET, POST, OPTIONS, PUT, DELETE, HEAD, PATCH'
-  );
-  next();
-};
+}
+
+export { CorsMiddlewares };
