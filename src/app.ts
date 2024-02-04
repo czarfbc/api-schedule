@@ -1,9 +1,10 @@
 import 'express-async-errors';
-import express, { Application, NextFunction, Request, Response } from 'express';
+import express, { Application } from 'express';
 import { UserRoutes } from './routes/users.routes';
 import { SchedulesRoutes } from './routes/schedules.routes';
 import { ErrorsMiddlewares } from './middlewares/errors.middleware';
 import cors, { CorsOptions } from 'cors';
+import requestIp from 'request-ip';
 
 export class App {
   private app: Application;
@@ -20,6 +21,7 @@ export class App {
     this.app.use(express.json());
     this.app.use(cors(corsConfig));
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(requestIp.mw());
   }
 
   private setupAllRoutes() {
