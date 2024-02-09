@@ -17,10 +17,16 @@ import {
   updateSchemaUsers,
   authSchemaUsers,
 } from '../validations/z.schemas/users.z.schemas';
-import { ErrorsHelpers } from '../helpers/errors.helpers';
+import {
+  BadRequestError,
+  NotFoundError,
+  TooManyRequestsError,
+  UnauthorizedError,
+  VariantAlsoNegotiatesError,
+} from '../helpers/errors.helpers';
 import { RequestRateLimitUtils } from '../utils/request.rate.limit';
 
-class UsersServices {
+export class UsersServices {
   private usersDALs: UsersDALs;
   private email: EmailUtils;
   private requestRateLimit: RequestRateLimitUtils;
@@ -36,9 +42,8 @@ class UsersServices {
   async create({ name, email, password }: ICreateUsers) {
     const findUser = await this.usersDALs.findUserByEmail(email);
     if (findUser) {
-      throw new ErrorsHelpers({
+      throw new BadRequestError({
         message: 'User already exists',
-        statusCode: 400,
       });
     }
 
@@ -63,9 +68,8 @@ class UsersServices {
     const validateInput = authSchemaUsers.parse({ email, password });
     const findUser = await this.usersDALs.findUserByEmail(validateInput.email);
     if (!findUser) {
-      throw new ErrorsHelpers({
+      throw new NotFoundError({
         message: 'Invalid email or password',
-        statusCode: 400,
       });
     }
 
@@ -74,18 +78,16 @@ class UsersServices {
       findUser.password
     );
     if (!passwordMatch) {
-      throw new ErrorsHelpers({
+      throw new BadRequestError({
         message: 'Invalid email or password',
-        statusCode: 400,
       });
     }
 
     let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
     let secretKey: string = env.ACCESS_KEY_TOKEN;
     if (!secretKey || !secretKeyRefreshToken) {
-      throw new ErrorsHelpers({
+      throw new VariantAlsoNegotiatesError({
         message: 'There is no token key or refresh token key',
-        statusCode: 506,
       });
     }
 
@@ -110,18 +112,16 @@ class UsersServices {
 
   async refresh(refreshToken: string) {
     if (!refreshToken) {
-      throw new ErrorsHelpers({
+      throw new BadRequestError({
         message: 'Refresh token missing',
-        statusCode: 400,
       });
     }
 
     let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
     let secretKey: string = env.ACCESS_KEY_TOKEN;
     if (!secretKey || !secretKeyRefreshToken) {
-      throw new ErrorsHelpers({
+      throw new VariantAlsoNegotiatesError({
         message: 'There is no token key or refresh token key',
-        statusCode: 506,
       });
     }
 
@@ -145,14 +145,13 @@ class UsersServices {
     if (oldPassword && newPassword) {
       const findUserById = await this.usersDALs.findUserById(user_id);
       if (!findUserById) {
-        throw new ErrorsHelpers({ message: 'User not found', statusCode: 404 });
+        throw new NotFoundError({ message: 'User not found' });
       }
 
       const passwordMatch = await compare(oldPassword, findUserById.password);
       if (!passwordMatch) {
-        throw new ErrorsHelpers({
+        throw new BadRequestError({
           message: 'Old password invalid',
-          statusCode: 400,
         });
       }
 
@@ -174,21 +173,19 @@ class UsersServices {
         message: 'User updated successfully',
       };
     } else {
-      throw new ErrorsHelpers({
+      throw new BadRequestError({
         message: 'Fill in the fields correctly',
-        statusCode: 400,
       });
     }
   }
 
   async forgotPassword({ email, ip }: IForgotPassword) {
     if (ip === undefined) {
-      throw new ErrorsHelpers({ message: 'Cannot find ip', statusCode: 404 });
+      throw new NotFoundError({ message: 'Cannot find ip' });
     }
     if (this.requestRateLimit.checkIfTheIpIsBlocked(ip)) {
-      throw new ErrorsHelpers({
+      throw new TooManyRequestsError({
         message: 'Too many requests. This IP has been blocked for 15 minutes',
-        statusCode: 429,
       });
     }
 
@@ -199,7 +196,7 @@ class UsersServices {
       this.invalidAttempts.set(ip, attempts + 1);
       if (attempts + 1 === 3) this.requestRateLimit.blockedIP(ip);
 
-      throw new ErrorsHelpers({ message: 'User not found', statusCode: 404 });
+      throw new NotFoundError({ message: 'User not found' });
     }
 
     const oneHours: number = 3600000;
@@ -231,15 +228,14 @@ class UsersServices {
     const findUser = await this.usersDALs.findUserByToken(resetToken);
 
     if (!findUser)
-      throw new ErrorsHelpers({
+      throw new NotFoundError({
         message: 'User by token not found',
-        statusCode: 404,
       });
 
     const now = new Date();
 
     if (findUser.resetTokenExpiry && now > findUser.resetTokenExpiry) {
-      throw new ErrorsHelpers({ message: 'Token expired', statusCode: 401 });
+      throw new UnauthorizedError({ message: 'Token expired' });
     }
 
     const validateInput = recoveryPasswordSchemaUsers.parse({
@@ -255,4 +251,3 @@ class UsersServices {
     return result;
   }
 }
-export { UsersServices };
