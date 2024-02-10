@@ -9,6 +9,7 @@ import {
   createSchemaSchedules,
   updateSchemaSchedule,
 } from '../validations/z.schemas/schedules.z.schemas';
+import { BadRequestError, NotFoundError } from '../helpers/errors.helpers';
 
 class SchedulesService {
   private schedulesDALs: SchedulesDALs;
@@ -29,7 +30,9 @@ class SchedulesService {
     const minuteStart = startOfMinute(dateFormatted);
 
     if (isBefore(minuteStart, new Date())) {
-      throw new Error('It is not allowed to schedule an old date');
+      throw new BadRequestError({
+        message: 'It is not allowed to schedule an old date',
+      });
     }
 
     const checkIsAvailable =
@@ -39,7 +42,9 @@ class SchedulesService {
       });
 
     if (checkIsAvailable) {
-      throw new Error('The scheduled date is not available');
+      throw new BadRequestError({
+        message: 'The scheduled date is not available',
+      });
     }
 
     const create = await this.schedulesDALs.create({
@@ -81,11 +86,13 @@ class SchedulesService {
     const minuteStart = startOfMinute(dateFormatted);
 
     if (isBefore(minuteStart, new Date())) {
-      throw new Error('It is not allowed to schedule an old date');
+      throw new BadRequestError({
+        message: 'It is not allowed to schedule an old date',
+      });
     }
 
     if (!user_id) {
-      throw new Error('User not found');
+      throw new NotFoundError({ message: 'User not found' });
     }
     const checkIsAvailable =
       await this.schedulesDALs.findIfVerificationIsAvailable({
@@ -94,7 +101,9 @@ class SchedulesService {
       });
 
     if (checkIsAvailable) {
-      throw new Error('The scheduled date is not available');
+      throw new BadRequestError({
+        message: 'The scheduled date is not available',
+      });
     }
 
     const result = await this.schedulesDALs.update({
