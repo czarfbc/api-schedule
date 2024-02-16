@@ -1,14 +1,7 @@
-import {
-  ICreateSchedules,
-  IFindSchedules,
-  IUpdateSchedule,
-} from '../validations/interfaces/services/schedules.interfaces';
+import * as schedulesInterfaces from '../validations/interfaces/services/schedules.interfaces';
 import { isBefore, startOfMinute } from 'date-fns';
 import { SchedulesDALs } from '../database/data.access.layer/schedules.dals';
-import {
-  createSchemaSchedules,
-  updateSchemaSchedule,
-} from '../validations/z.schemas/schedules.z.schemas';
+import * as schedulesZSchemas from '../validations/z.schemas/schedules.z.schemas';
 import { BadRequestError, NotFoundError } from '../helpers/errors.helpers';
 
 class SchedulesService {
@@ -17,8 +10,14 @@ class SchedulesService {
     this.schedulesDALs = new SchedulesDALs();
   }
 
-  async create({ name, phone, date, user_id, description }: ICreateSchedules) {
-    const validateInput = createSchemaSchedules.parse({
+  async create({
+    name,
+    phone,
+    date,
+    user_id,
+    description,
+  }: schedulesInterfaces.ICreateSchedules) {
+    const validateInput = schedulesZSchemas.createSchemaSchedules.parse({
       name,
       phone,
       date,
@@ -58,7 +57,10 @@ class SchedulesService {
     return create;
   }
 
-  async findEverythingOfTheDay({ date, user_id }: IFindSchedules) {
+  async findEverythingOfTheDay({
+    date,
+    user_id,
+  }: schedulesInterfaces.IFindSchedules) {
     const result = await this.schedulesDALs.findEverythingOfTheDay({
       date,
       user_id,
@@ -73,8 +75,14 @@ class SchedulesService {
     return result;
   }
 
-  async update({ id, date, user_id, phone, description }: IUpdateSchedule) {
-    const validateInput = updateSchemaSchedule.parse({
+  async update({
+    id,
+    date,
+    user_id,
+    phone,
+    description,
+  }: schedulesInterfaces.IUpdateSchedule) {
+    const validateInput = schedulesZSchemas.updateSchemaSchedule.parse({
       id,
       date,
       phone,
