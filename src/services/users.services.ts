@@ -1,26 +1,14 @@
 import { compare, hash } from 'bcrypt';
-import {
-  IAuthUsers,
-  ICreateUsers,
-  IRecoveryPassword,
-  IUpdateUsers,
-  IForgotPassword,
-} from '../validations/interfaces/services/users.interfaces';
+import * as usersInterfaces from '../validations/interfaces/services/users.interfaces';
 import { UsersDALs } from '../database/data.access.layer/users.dals';
 import { sign, verify } from 'jsonwebtoken';
 import { EmailUtils } from '../utils/email.utils';
 import { env } from '../validations/z.schemas/env.z.schemas';
-import {
-  createSchemaUsers,
-  recoveryPasswordSchemaUsers,
-  updateResetTokenSchemaUsers,
-  updateSchemaUsers,
-  authSchemaUsers,
-} from '../validations/z.schemas/users.z.schemas';
-import { ErrorsHelpers } from '../helpers/errors.helpers';
+import * as usersZScemas from '../validations/z.schemas/users.z.schemas';
+import * as errorsHelpers from '../helpers/errors.helpers';
 import { RequestRateLimitUtils } from '../utils/request.rate.limit';
 
-class UsersServices {
+export class UsersServices {
   private usersDALs: UsersDALs;
   private email: EmailUtils;
   private requestRateLimit: RequestRateLimitUtils;
@@ -33,16 +21,19 @@ class UsersServices {
     this.invalidAttempts = new Map();
   }
 
-  async create({ name, email, password }: ICreateUsers) {
+  async create({ name, email, password }: usersInterfaces.ICreateUsers) {
     const findUser = await this.usersDALs.findUserByEmail(email);
     if (findUser) {
-      throw new ErrorsHelpers({
+      throw new errorsHelpers.BadRequestError({
         message: 'User already exists',
-        statusCode: 400,
       });
     }
 
-    const validateInput = createSchemaUsers.parse({ name, email, password });
+    const validateInput = usersZScemas.createSchemaUsers.parse({
+      name,
+      email,
+      password,
+    });
     const hashPassword = await hash(validateInput.password, 10);
     const create = await this.usersDALs.create({
       name: validateInput.name,
@@ -56,23 +47,18 @@ class UsersServices {
       html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
     });
 
-    if (!emailData) {
-      throw new ErrorsHelpers({
-        message: 'Error sending email',
-        statusCode: 500,
-      });
-    }
-
     return { create, emailData };
   }
 
-  async auth({ email, password }: IAuthUsers) {
-    const validateInput = authSchemaUsers.parse({ email, password });
+  async auth({ email, password }: usersInterfaces.IAuthUsers) {
+    const validateInput = usersZScemas.authSchemaUsers.parse({
+      email,
+      password,
+    });
     const findUser = await this.usersDALs.findUserByEmail(validateInput.email);
     if (!findUser) {
-      throw new ErrorsHelpers({
+      throw new errorsHelpers.NotFoundError({
         message: 'Invalid email or password',
-        statusCode: 400,
       });
     }
 
@@ -81,18 +67,16 @@ class UsersServices {
       findUser.password
     );
     if (!passwordMatch) {
-      throw new ErrorsHelpers({
+      throw new errorsHelpers.BadRequestError({
         message: 'Invalid email or password',
-        statusCode: 400,
       });
     }
 
     let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
     let secretKey: string = env.ACCESS_KEY_TOKEN;
     if (!secretKey || !secretKeyRefreshToken) {
-      throw new ErrorsHelpers({
+      throw new errorsHelpers.VariantAlsoNegotiatesError({
         message: 'There is no token key or refresh token key',
-        statusCode: 506,
       });
     }
 
@@ -117,18 +101,16 @@ class UsersServices {
 
   async refresh(refreshToken: string) {
     if (!refreshToken) {
-      throw new ErrorsHelpers({
+      throw new errorsHelpers.BadRequestError({
         message: 'Refresh token missing',
-        statusCode: 400,
       });
     }
 
     let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
     let secretKey: string = env.ACCESS_KEY_TOKEN;
     if (!secretKey || !secretKeyRefreshToken) {
-      throw new ErrorsHelpers({
+      throw new errorsHelpers.VariantAlsoNegotiatesError({
         message: 'There is no token key or refresh token key',
-        statusCode: 506,
       });
     }
 
@@ -148,22 +130,26 @@ class UsersServices {
     };
   }
 
-  async update({ oldPassword, newPassword, user_id, name }: IUpdateUsers) {
+  async update({
+    oldPassword,
+    newPassword,
+    user_id,
+    name,
+  }: usersInterfaces.IUpdateUsers) {
     if (oldPassword && newPassword) {
       const findUserById = await this.usersDALs.findUserById(user_id);
       if (!findUserById) {
-        throw new ErrorsHelpers({ message: 'User not found', statusCode: 404 });
+        throw new errorsHelpers.NotFoundError({ message: 'User not found' });
       }
 
       const passwordMatch = await compare(oldPassword, findUserById.password);
       if (!passwordMatch) {
-        throw new ErrorsHelpers({
+        throw new errorsHelpers.BadRequestError({
           message: 'Old password invalid',
-          statusCode: 400,
         });
       }
 
-      const validateInput = updateSchemaUsers.parse({
+      const validateInput = usersZScemas.updateSchemaUsers.parse({
         name,
         oldPassword,
         newPassword,
@@ -181,21 +167,19 @@ class UsersServices {
         message: 'User updated successfully',
       };
     } else {
-      throw new ErrorsHelpers({
+      throw new errorsHelpers.BadRequestError({
         message: 'Fill in the fields correctly',
-        statusCode: 400,
       });
     }
   }
 
-  async forgotPassword({ email, ip }: IForgotPassword) {
+  async forgotPassword({ email, ip }: usersInterfaces.IForgotPassword) {
     if (ip === undefined) {
-      throw new ErrorsHelpers({ message: 'Cannot find ip', statusCode: 404 });
+      throw new errorsHelpers.NotFoundError({ message: 'Cannot find ip' });
     }
     if (this.requestRateLimit.checkIfTheIpIsBlocked(ip)) {
-      throw new ErrorsHelpers({
+      throw new errorsHelpers.TooManyRequestsError({
         message: 'Too many requests. This IP has been blocked for 15 minutes',
-        statusCode: 429,
       });
     }
 
@@ -206,14 +190,14 @@ class UsersServices {
       this.invalidAttempts.set(ip, attempts + 1);
       if (attempts + 1 === 3) this.requestRateLimit.blockedIP(ip);
 
-      throw new ErrorsHelpers({ message: 'User not found', statusCode: 404 });
+      throw new errorsHelpers.NotFoundError({ message: 'User not found' });
     }
 
     const oneHours: number = 3600000;
     const resetToken = await hash(findUser.email + Date.now(), 10);
     const resetTokenExpiry = new Date(Date.now() + oneHours);
 
-    const validateInput = updateResetTokenSchemaUsers.parse({
+    const validateInput = usersZScemas.updateResetTokenSchemaUsers.parse({
       resetToken,
       resetTokenExpiry,
       email: findUser.email,
@@ -231,32 +215,27 @@ class UsersServices {
       html: `"<p>codigo para recuperar senha <h1>${token.resetToken}</h1></p>`,
     });
 
-    if (!emailData) {
-      throw new ErrorsHelpers({
-        message: 'Error sending email',
-        statusCode: 500,
-      });
-    }
-
     return emailData;
   }
 
-  async recoveryPassword({ resetToken, newPassword }: IRecoveryPassword) {
+  async recoveryPassword({
+    resetToken,
+    newPassword,
+  }: usersInterfaces.IRecoveryPassword) {
     const findUser = await this.usersDALs.findUserByToken(resetToken);
 
     if (!findUser)
-      throw new ErrorsHelpers({
+      throw new errorsHelpers.NotFoundError({
         message: 'User by token not found',
-        statusCode: 404,
       });
 
     const now = new Date();
 
     if (findUser.resetTokenExpiry && now > findUser.resetTokenExpiry) {
-      throw new ErrorsHelpers({ message: 'Token expired', statusCode: 401 });
+      throw new errorsHelpers.UnauthorizedError({ message: 'Token expired' });
     }
 
-    const validateInput = recoveryPasswordSchemaUsers.parse({
+    const validateInput = usersZScemas.recoveryPasswordSchemaUsers.parse({
       newPassword,
     });
 
@@ -269,4 +248,3 @@ class UsersServices {
     return result;
   }
 }
-export { UsersServices };

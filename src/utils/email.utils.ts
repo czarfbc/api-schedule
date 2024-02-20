@@ -2,6 +2,7 @@ import { Resend } from 'resend';
 import { ISendEmail } from '../validations/interfaces/services/email.interfaces';
 import { env } from '../validations/z.schemas/env.z.schemas';
 import { emailSchema } from '../validations/z.schemas/email.z.schemas';
+import { ErrorsHelpers } from '../helpers/errors.helpers';
 
 class EmailUtils {
   private resend: Resend;
@@ -18,6 +19,13 @@ class EmailUtils {
       subject: validateInput.subject,
       html: validateInput.html,
     });
+
+    if (!emailData) {
+      throw new ErrorsHelpers({
+        message: 'Error sending email',
+        statusCode: 500,
+      });
+    }
 
     return emailData;
   }
