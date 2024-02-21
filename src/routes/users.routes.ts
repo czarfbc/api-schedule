@@ -39,12 +39,12 @@ class UserRoutes {
     );
 
     this.router.patch(
-      '/forgotPassword',
+      '/forgot-password',
       this.usersController.forgotPassword.bind(this.usersController)
     );
 
     this.router.patch(
-      '/updatePassword',
+      '/update-password',
       this.usersController.recoveryPassword.bind(this.usersController)
     );
 

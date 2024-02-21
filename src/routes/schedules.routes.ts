@@ -25,7 +25,7 @@ class SchedulesRoutes {
 
   getRoutes() {
     this.router.get(
-      '/getofday',
+      '/get-of-day',
       this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
       this.schedulesController.findEverythingOfTheDay.bind(
         this.schedulesController
@@ -33,7 +33,7 @@ class SchedulesRoutes {
     );
 
     this.router.get(
-      '/getall',
+      '/get-all',
       this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
       this.schedulesController.findEverythingOfTheDay.bind(
         this.schedulesController
@@ -55,7 +55,7 @@ class SchedulesRoutes {
 
   deleteRoutes() {
     this.router.delete(
-      '/deleteoldschedules',
+      '/delete-old-schedules',
       this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
       this.schedulesController.deleteOldSchedules.bind(this.schedulesController)
     );
