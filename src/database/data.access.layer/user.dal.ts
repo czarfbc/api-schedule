@@ -1,16 +1,16 @@
 import { prisma } from '../prisma';
-import * as usersInterfaces from '../../validations/interfaces/services/users.interfaces';
-import * as usersZScemas from '../../validations/z.schemas/users.z.schemas';
+import * as userInterfaces from '../../validations/interfaces/services/user.interfaces';
+import * as userZScemas from '../../validations/z.schemas/user.z.schemas';
 
-class UsersDALs {
-  async create({ name, email, password }: usersInterfaces.ICreateUsers) {
-    const validateInput = usersZScemas.createSchemaUsers.parse({
+class UserDAL {
+  async create({ name, email, password }: userInterfaces.ICreateUser) {
+    const validateInput = userZScemas.createSchemaUser.parse({
       name,
       email,
       password,
     });
 
-    const result = await prisma.users.create({
+    const result = await prisma.user.create({
       data: {
         name: validateInput.name,
         email: validateInput.email,
@@ -21,7 +21,7 @@ class UsersDALs {
   }
 
   async findUserByEmail(email: string) {
-    const result = await prisma.users.findUnique({
+    const result = await prisma.user.findUnique({
       where: {
         email,
       },
@@ -30,7 +30,7 @@ class UsersDALs {
   }
 
   async findUserById(id: string) {
-    const result = await prisma.users.findUnique({
+    const result = await prisma.user.findUnique({
       where: {
         id,
       },
@@ -38,14 +38,14 @@ class UsersDALs {
     return result;
   }
 
-  async update({ newPassword, user_id, name }: usersInterfaces.IUpdateUsers) {
-    const validateInput = usersZScemas.updateSchemaUsers.parse({
+  async update({ newPassword, user_id, name }: userInterfaces.IUpdateUser) {
+    const validateInput = userZScemas.updateSchemaUser.parse({
       newPassword,
       user_id,
       name,
     });
 
-    const result = await prisma.users.update({
+    const result = await prisma.user.update({
       where: {
         id: validateInput.user_id,
       },
@@ -61,8 +61,8 @@ class UsersDALs {
     resetToken,
     resetTokenExpiry,
     email,
-  }: usersInterfaces.IUsersUpdateResetToken) {
-    const result = await prisma.users.update({
+  }: userInterfaces.IUserUpdateResetToken) {
+    const result = await prisma.user.update({
       where: {
         email,
       },
@@ -76,7 +76,7 @@ class UsersDALs {
   }
 
   async findUserByToken(resetToken: string) {
-    const result = await prisma.users.findFirstOrThrow({
+    const result = await prisma.user.findFirstOrThrow({
       where: {
         resetToken,
       },
@@ -84,11 +84,8 @@ class UsersDALs {
 
     return result;
   }
-  async updatePassword({
-    newPassword,
-    email,
-  }: usersInterfaces.IUpdatePassword) {
-    const result = await prisma.users.update({
+  async updatePassword({ newPassword, email }: userInterfaces.IUpdatePassword) {
+    const result = await prisma.user.update({
       where: {
         email,
       },
@@ -102,4 +99,4 @@ class UsersDALs {
     return result;
   }
 }
-export { UsersDALs };
+export { UserDAL };

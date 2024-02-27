@@ -1,18 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
-import { SchedulesService } from '../services/schedules.service';
+import { ScheduleService } from '../services/schedule.service';
 import { parseISO } from 'date-fns';
 
-class SchedulesController {
-  private schedulesService: SchedulesService;
+class ScheduleController {
+  private scheduleService: ScheduleService;
   constructor() {
-    this.schedulesService = new SchedulesService();
+    this.scheduleService = new ScheduleService();
   }
 
   async create(request: Request, response: Response, next: NextFunction) {
     const { name, phone, date, description } = request.body;
     const { user_id } = request;
 
-    const result = await this.schedulesService.create({
+    const result = await this.scheduleService.create({
       name,
       phone,
       date,
@@ -32,7 +32,7 @@ class SchedulesController {
     const { user_id } = request;
     const parseDate = date ? parseISO(date.toString()) : new Date();
 
-    const result = await this.schedulesService.findEverythingOfTheDay({
+    const result = await this.scheduleService.findEverythingOfTheDay({
       date: parseDate,
       user_id,
     });
@@ -43,7 +43,7 @@ class SchedulesController {
   async findAll(request: Request, response: Response, next: NextFunction) {
     const { user_id } = request;
 
-    const result = await this.schedulesService.findAll(user_id);
+    const result = await this.scheduleService.findAll(user_id);
 
     return response.json(result);
   }
@@ -53,7 +53,7 @@ class SchedulesController {
     const { date, phone, description } = request.body;
     const { user_id } = request;
 
-    const result = await this.schedulesService.update({
+    const result = await this.scheduleService.update({
       id,
       date,
       user_id,
@@ -67,7 +67,7 @@ class SchedulesController {
   async delete(request: Request, response: Response, next: NextFunction) {
     const { id } = request.params;
 
-    const result = await this.schedulesService.delete(id);
+    const result = await this.scheduleService.delete(id);
 
     return response.status(204).json(result);
   }
@@ -79,10 +79,10 @@ class SchedulesController {
   ) {
     const { user_id } = request;
 
-    const result = await this.schedulesService.deleteOldSchedules(user_id);
+    const result = await this.scheduleService.deleteOldSchedules(user_id);
 
     return response.status(204).json(result);
   }
 }
 
-export { SchedulesController };
+export { ScheduleController };

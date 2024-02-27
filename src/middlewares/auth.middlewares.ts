@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
-import { IPayload } from '../validations/interfaces/services/users.interfaces';
+import { IPayload } from '../validations/interfaces/services/user.interfaces';
 import { env } from '../validations/z.schemas/env.z.schemas';
-import { VariantAlsoNegotiatesError } from '../helpers/errors.helpers';
+import { VariantAlsoNegotiatesError } from '../helpers/error.helpers';
 
 class AuthMiddlewares {
   handleAuth(request: Request, response: Response, next: NextFunction) {

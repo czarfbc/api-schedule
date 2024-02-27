@@ -1,31 +1,32 @@
 import { Router } from 'express';
-import { UsersController } from '../controllers/users.cotroller';
+import { UserController } from '../controllers/user.cotroller';
 import { AuthMiddlewares } from '../middlewares/auth.middlewares';
+
 class UserRoutes {
   private router: Router;
-  private usersController: UsersController;
+  private userController: UserController;
   private authMiddlewares: AuthMiddlewares;
 
   constructor() {
     this.router = Router();
-    this.usersController = new UsersController();
+    this.userController = new UserController();
     this.authMiddlewares = new AuthMiddlewares();
   }
 
   postRoutes() {
     this.router.post(
       '/create',
-      this.usersController.create.bind(this.usersController)
+      this.userController.create.bind(this.userController)
     );
 
     this.router.post(
       '/auth',
-      this.usersController.auth.bind(this.usersController)
+      this.userController.auth.bind(this.userController)
     );
 
     this.router.post(
       '/refresh',
-      this.usersController.refresh.bind(this.usersController)
+      this.userController.refresh.bind(this.userController)
     );
 
     return this.router;
@@ -35,17 +36,17 @@ class UserRoutes {
     this.router.patch(
       '/update',
       this.authMiddlewares.handleAuth.bind(this.authMiddlewares),
-      this.usersController.update.bind(this.usersController)
+      this.userController.update.bind(this.userController)
     );
 
     this.router.patch(
       '/forgot-password',
-      this.usersController.forgotPassword.bind(this.usersController)
+      this.userController.forgotPassword.bind(this.userController)
     );
 
     this.router.patch(
       '/update-password',
-      this.usersController.recoveryPassword.bind(this.usersController)
+      this.userController.recoveryPassword.bind(this.userController)
     );
 
     return this.router;

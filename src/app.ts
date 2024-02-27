@@ -1,18 +1,18 @@
 import 'express-async-errors';
 import express, { Application } from 'express';
-import { UserRoutes } from './routes/users.routes';
-import { SchedulesRoutes } from './routes/schedules.routes';
-import { ErrorsMiddlewares } from './middlewares/errors.middleware';
+import { UserRoutes } from './routes/user.routes';
+import { SchedulesRoutes } from './routes/schedule.routes';
+import { ErrorMiddlewares } from './middlewares/error.middleware';
 import cors, { CorsOptions } from 'cors';
 import requestIp from 'request-ip';
 
 export class App {
   private app: Application;
-  private errorsMiddlewares: ErrorsMiddlewares;
+  private errorMiddlewares: ErrorMiddlewares;
 
   constructor(corsConfig: CorsOptions) {
     this.app = express();
-    this.errorsMiddlewares = new ErrorsMiddlewares();
+    this.errorMiddlewares = new ErrorMiddlewares();
     this.middleware(corsConfig);
     this.setupAllRoutes();
   }
@@ -31,14 +31,14 @@ export class App {
 
   private setupUsersRoutes() {
     const userRouters = new UserRoutes();
-    const userBaseRoute = '/users';
+    const userBaseRoute = '/user';
     this.app.use(userBaseRoute, userRouters.postRoutes());
     this.app.use(userBaseRoute, userRouters.patchRoutes());
   }
 
   private setupSchedulesRoutes() {
     const schedulesRoutes = new SchedulesRoutes();
-    const scheduleBaseRoute = '/schedules';
+    const scheduleBaseRoute = '/schedule';
     this.app.use(scheduleBaseRoute, schedulesRoutes.postRoutes());
     this.app.use(scheduleBaseRoute, schedulesRoutes.getRoutes());
     this.app.use(scheduleBaseRoute, schedulesRoutes.patchRoutes());
@@ -49,8 +49,6 @@ export class App {
     this.app.listen(port, () => {
       console.log(`Servidor rodando na porta ${port}`);
     });
-    this.app.use(
-      this.errorsMiddlewares.handleError.bind(this.errorsMiddlewares)
-    );
+    this.app.use(this.errorMiddlewares.handleError.bind(this.errorMiddlewares));
   }
 }

@@ -1,37 +1,29 @@
 import { endOfDay, startOfDay } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
 import { prisma } from '../prisma';
-import * as schedulesInterfaces from '../../validations/interfaces/services/schedules.interfaces';
-import * as schedulesZSchemas from '../../validations/z.schemas/schedules.z.schemas';
+import * as scheduleInterfaces from '../../validations/interfaces/services/schedule.interfaces';
 
-class SchedulesDALs {
+class ScheduleDAL {
   async create({
     name,
     phone,
     date,
     user_id,
     description,
-  }: schedulesInterfaces.ICreateSchedules) {
-    const validateInput = schedulesZSchemas.createSchemaSchedules.parse({
-      name,
-      phone,
-      date,
-      user_id,
-      description,
-    });
-
+  }: scheduleInterfaces.ICreateSchedule) {
     const timeZone = 'America/Sao_Paulo';
-    const dateInGmtMinus3 = utcToZonedTime(validateInput.date, timeZone);
+    const dateInGmtMinus3 = utcToZonedTime(date, timeZone);
 
     const result = await prisma.schedule.create({
       data: {
-        name: validateInput.name,
-        phone: validateInput.phone,
+        name,
+        phone,
         date: dateInGmtMinus3,
-        user_id: validateInput.user_id,
-        description: validateInput.description,
+        user_id,
+        description,
       },
     });
+
     return result;
   }
 
@@ -68,7 +60,7 @@ class SchedulesDALs {
   async findIfVerificationIsAvailable({
     date,
     user_id,
-  }: schedulesInterfaces.IFindSchedules) {
+  }: scheduleInterfaces.IFindSchedule) {
     const result = await prisma.schedule.findFirst({
       where: {
         date,
@@ -88,7 +80,7 @@ class SchedulesDALs {
   async findEverythingOfTheDay({
     date,
     user_id,
-  }: schedulesInterfaces.IFindSchedules) {
+  }: scheduleInterfaces.IFindSchedule) {
     const result = await prisma.schedule.findMany({
       where: {
         date: {
@@ -109,23 +101,18 @@ class SchedulesDALs {
     date,
     phone,
     description,
-  }: schedulesInterfaces.IUpdateSchedule) {
-    const validateInput = schedulesZSchemas.updateSchemaSchedule.parse({
-      id,
-      date,
-      phone,
-      description,
-    });
+  }: scheduleInterfaces.IUpdateSchedule) {
     const result = await prisma.schedule.update({
       where: {
-        id: validateInput.id,
+        id,
       },
       data: {
-        date: validateInput.date,
-        phone: validateInput.phone,
-        description: validateInput.description,
+        date,
+        phone,
+        description,
       },
     });
+
     return result;
   }
 
@@ -136,4 +123,4 @@ class SchedulesDALs {
     return result;
   }
 }
-export { SchedulesDALs };
+export { ScheduleDAL };

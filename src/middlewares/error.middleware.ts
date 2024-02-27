@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
-import { ErrorsHelpers } from '../helpers/errors.helpers';
+import { ErrorHelpers } from '../helpers/error.helpers';
 
-class ErrorsMiddlewares {
+class ErrorMiddlewares {
   handleError(
-    error: Error & Partial<ErrorsHelpers>,
+    error: Error & Partial<ErrorHelpers>,
     request: Request,
     response: Response,
     next: NextFunction
@@ -17,10 +17,11 @@ class ErrorsMiddlewares {
     }
 
     const statusCode = error.statusCode ?? 500;
-    const message = error.statusCode ? error.message : 'Internal Server Error';
+    // const message = error.statusCode ? error.message : 'Internal Server Error';
+    const message = error.message;
 
     return response.status(statusCode).json({ statusCode, message });
   }
 }
 
-export { ErrorsMiddlewares };
+export { ErrorMiddlewares };

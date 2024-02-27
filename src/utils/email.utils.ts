@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 import { ISendEmail } from '../validations/interfaces/services/email.interfaces';
 import { env } from '../validations/z.schemas/env.z.schemas';
 import { emailSchema } from '../validations/z.schemas/email.z.schemas';
-import { ErrorsHelpers } from '../helpers/errors.helpers';
+import * as errorHelpers from '../helpers/error.helpers';
 
 class EmailUtils {
   private resend: Resend;
@@ -21,9 +21,8 @@ class EmailUtils {
     });
 
     if (!emailData) {
-      throw new ErrorsHelpers({
+      throw new errorHelpers.InternalServerError({
         message: 'Error sending email',
-        statusCode: 500,
       });
     }
 

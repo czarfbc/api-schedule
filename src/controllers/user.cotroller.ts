@@ -1,16 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
-import { UsersServices } from '../services/users.services';
+import { UserService } from '../services/user.service';
 
-class UsersController {
-  private usersServices: UsersServices;
+class UserController {
+  private userService: UserService;
   constructor() {
-    this.usersServices = new UsersServices();
+    this.userService = new UserService();
   }
 
   async create(request: Request, response: Response, next: NextFunction) {
     const { name, email, password } = request.body;
 
-    const result = await this.usersServices.create({ name, email, password });
+    const result = await this.userService.create({ name, email, password });
 
     return response.status(201).json({ result });
   }
@@ -18,7 +18,7 @@ class UsersController {
   async auth(request: Request, response: Response, next: NextFunction) {
     const { email, password } = request.body;
 
-    const result = await this.usersServices.auth({ email, password });
+    const result = await this.userService.auth({ email, password });
 
     return response.json(result);
   }
@@ -26,7 +26,7 @@ class UsersController {
   async refresh(request: Request, response: Response, next: NextFunction) {
     const { refreshToken } = request.body;
 
-    const result = await this.usersServices.refresh(refreshToken);
+    const result = await this.userService.refresh(refreshToken);
 
     return response.json(result);
   }
@@ -35,7 +35,7 @@ class UsersController {
     const { name, oldPassword, newPassword } = request.body;
     const { user_id } = request;
 
-    const result = await this.usersServices.update({
+    const result = await this.userService.update({
       name,
       oldPassword,
       newPassword,
@@ -53,7 +53,7 @@ class UsersController {
     const { email } = request.body;
     const ip = request.clientIp;
 
-    const result = await this.usersServices.forgotPassword({ email, ip });
+    const result = await this.userService.forgotPassword({ email, ip });
 
     return response.status(200).json(result);
   }
@@ -65,7 +65,7 @@ class UsersController {
   ) {
     const { resetToken, newPassword } = request.body;
 
-    const result = await this.usersServices.recoveryPassword({
+    const result = await this.userService.recoveryPassword({
       resetToken,
       newPassword,
     });
@@ -73,4 +73,4 @@ class UsersController {
     return response.status(200).json(result);
   }
 }
-export { UsersController };
+export { UserController };

@@ -1,4 +1,4 @@
-export interface ICreateSchedules {
+export interface ICreateSchedule {
   name: string;
   phone: string;
   date: Date;
@@ -6,7 +6,7 @@ export interface ICreateSchedules {
   description: string;
 }
 
-export interface IFindSchedules {
+export interface IFindSchedule {
   date: Date;
   user_id: string;
 }

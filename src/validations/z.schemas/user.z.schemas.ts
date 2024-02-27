@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const createSchemaUsers = z.object({
+export const createSchemaUser = z.object({
   name: z
     .string()
     .min(3, { message: 'Name must be at least 3 characters long' }),
@@ -10,14 +10,14 @@ export const createSchemaUsers = z.object({
     .min(8, { message: 'Password must be at least 8 characters long' }),
 });
 
-export const authSchemaUsers = z.object({
+export const authSchemaUser = z.object({
   email: z.string().email({ message: 'Invalid email' }),
   password: z
     .string()
     .min(8, { message: 'Password must be at least 8 characters long' }),
 });
 
-export const updateSchemaUsers = z.object({
+export const updateSchemaUser = z.object({
   name: z
     .string()
     .min(3, { message: 'Name must be at least 3 characters long' }),
@@ -31,13 +31,13 @@ export const updateSchemaUsers = z.object({
   user_id: z.string().uuid(),
 });
 
-export const updateResetTokenSchemaUsers = z.object({
+export const updateResetTokenSchemaUser = z.object({
   resetToken: z.string(),
   resetTokenExpiry: z.coerce.date(),
   email: z.string().email({ message: 'Invalid email' }),
 });
 
-export const recoveryPasswordSchemaUsers = z.object({
+export const recoveryPasswordSchemaUser = z.object({
   newPassword: z
     .string()
     .min(8, { message: 'Password must be at least 8 characters long' }),
