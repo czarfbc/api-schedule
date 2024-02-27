@@ -1,22 +1,16 @@
 import { prisma } from '../prisma';
 import * as userInterfaces from '../../validations/interfaces/services/user.interfaces';
-import * as userZScemas from '../../validations/z.schemas/user.z.schemas';
 
 class UserDAL {
   async create({ name, email, password }: userInterfaces.ICreateUser) {
-    const validateInput = userZScemas.createSchemaUser.parse({
-      name,
-      email,
-      password,
-    });
-
     const result = await prisma.user.create({
       data: {
-        name: validateInput.name,
-        email: validateInput.email,
-        password: validateInput.password,
+        email,
+        password,
+        name,
       },
     });
+
     return result;
   }
 
@@ -39,19 +33,13 @@ class UserDAL {
   }
 
   async update({ newPassword, user_id, name }: userInterfaces.IUpdateUser) {
-    const validateInput = userZScemas.updateSchemaUser.parse({
-      newPassword,
-      user_id,
-      name,
-    });
-
     const result = await prisma.user.update({
       where: {
-        id: validateInput.user_id,
+        id: user_id,
       },
       data: {
-        password: validateInput.newPassword,
-        name: validateInput.name,
+        password: newPassword,
+        name,
       },
     });
     return result;
