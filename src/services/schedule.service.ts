@@ -2,6 +2,7 @@ import * as schedulesInterfaces from '../validations/interfaces/services/schedul
 import { isBefore, startOfMinute } from 'date-fns';
 import { ScheduleDAL } from '../database/data.access.layer/schedule.dal';
 import * as errorHelpers from '../helpers/error.helpers';
+import * as scheduleZScemas from '../validations/z.schemas/schedule.z.schemas';
 
 class ScheduleService {
   private scheduleDAL: ScheduleDAL;
@@ -37,9 +38,9 @@ class ScheduleService {
       });
     }
 
-    if (name == '') {
+    if (name.length < 3) {
       throw new errorHelpers.BadRequestError({
-        message: 'Name cannot be empty',
+        message: 'Name must be at least 3 characters long',
       });
     }
 

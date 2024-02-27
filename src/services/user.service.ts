@@ -4,7 +4,7 @@ import { UserDAL } from '../database/data.access.layer/user.dal';
 import { sign, verify } from 'jsonwebtoken';
 import { EmailUtils } from '../utils/email.utils';
 import { env } from '../validations/z.schemas/env.z.schemas';
-import * as usersZScemas from '../validations/z.schemas/user.z.schemas';
+import * as userZScemas from '../validations/z.schemas/user.z.schemas';
 import * as errorHelpers from '../helpers/error.helpers';
 import { RequestRateLimitUtils } from '../utils/request.rate.limit';
 
@@ -29,7 +29,7 @@ class UserService {
       });
     }
 
-    const validateInput = usersZScemas.createSchemaUser.parse({
+    const validateInput = userZScemas.createSchemaUser.parse({
       name,
       email,
       password,
@@ -51,7 +51,7 @@ class UserService {
   }
 
   async auth({ email, password }: usersInterfaces.IAuthUser) {
-    const validateInput = usersZScemas.authSchemaUser.parse({
+    const validateInput = userZScemas.authSchemaUser.parse({
       email,
       password,
     });
@@ -149,7 +149,7 @@ class UserService {
         });
       }
 
-      const validateInput = usersZScemas.updateSchemaUser.parse({
+      const validateInput = userZScemas.updateSchemaUser.parse({
         name,
         oldPassword,
         newPassword,
@@ -197,7 +197,7 @@ class UserService {
     const resetToken = await hash(findUser.email + Date.now(), 10);
     const resetTokenExpiry = new Date(Date.now() + oneHours);
 
-    const validateInput = usersZScemas.updateResetTokenSchemaUser.parse({
+    const validateInput = userZScemas.updateResetTokenSchemaUser.parse({
       resetToken,
       resetTokenExpiry,
       email: findUser.email,
@@ -235,7 +235,7 @@ class UserService {
       throw new errorHelpers.UnauthorizedError({ message: 'Token expired' });
     }
 
-    const validateInput = usersZScemas.recoveryPasswordSchemaUser.parse({
+    const validateInput = userZScemas.recoveryPasswordSchemaUser.parse({
       newPassword,
     });
 
