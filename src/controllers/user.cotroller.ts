@@ -63,7 +63,8 @@ class UserController {
     response: Response,
     next: NextFunction
   ) {
-    const { resetToken, newPassword } = request.body;
+    const { resetToken } = request.query as { resetToken: string };
+    const { newPassword } = request.body;
 
     const result = await this.userService.recoveryPassword({
       resetToken,
@@ -73,4 +74,5 @@ class UserController {
     return response.status(200).json(result);
   }
 }
+
 export { UserController };
