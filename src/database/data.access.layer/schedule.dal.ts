@@ -67,6 +67,7 @@ class ScheduleDAL {
         user_id,
       },
     });
+
     return result;
   }
 
@@ -100,6 +101,7 @@ class ScheduleDAL {
     id,
     date,
     phone,
+    name,
     description,
   }: scheduleInterfaces.IUpdateSchedule) {
     const result = await prisma.schedule.update({
@@ -108,6 +110,7 @@ class ScheduleDAL {
       },
       data: {
         date,
+        name,
         phone,
         description,
       },

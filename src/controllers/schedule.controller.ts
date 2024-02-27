@@ -50,12 +50,13 @@ class ScheduleController {
 
   async update(request: Request, response: Response, next: NextFunction) {
     const { id } = request.params;
-    const { date, phone, description } = request.body;
+    const { date, name, phone, description } = request.body;
     const { user_id } = request;
 
     const result = await this.scheduleService.update({
       id,
       date,
+      name,
       user_id,
       phone,
       description,

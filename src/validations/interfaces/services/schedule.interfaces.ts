@@ -13,6 +13,7 @@ export interface IFindSchedule {
 
 export interface IUpdateSchedule {
   id: string;
+  name: string;
   date: Date;
   phone: string;
   description: string;

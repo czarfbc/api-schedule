@@ -17,8 +17,7 @@ class ErrorMiddlewares {
     }
 
     const statusCode = error.statusCode ?? 500;
-    // const message = error.statusCode ? error.message : 'Internal Server Error';
-    const message = error.message;
+    const message = error.statusCode ? error.message : 'Internal Server Error';
 
     return response.status(statusCode).json({ statusCode, message });
   }

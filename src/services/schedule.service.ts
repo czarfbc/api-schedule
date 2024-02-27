@@ -25,15 +25,21 @@ class ScheduleService {
       });
     }
 
-    const checkIsAvailable =
+    const checkIfItisNotAvailable =
       await this.scheduleDAL.findIfVerificationIsAvailable({
         date: minuteStart,
         user_id,
       });
 
-    if (checkIsAvailable) {
+    if (checkIfItisNotAvailable) {
       throw new errorHelpers.BadRequestError({
         message: 'The scheduled date is not available',
+      });
+    }
+
+    if (name == '') {
+      throw new errorHelpers.BadRequestError({
+        message: 'Name cannot be empty',
       });
     }
 
@@ -69,6 +75,7 @@ class ScheduleService {
   async update({
     id,
     date,
+    name,
     user_id,
     phone,
     description,
@@ -86,13 +93,13 @@ class ScheduleService {
       throw new errorHelpers.NotFoundError({ message: 'User not found' });
     }
 
-    const checkIsAvailable =
+    const checkIfItisNotAvailable =
       await this.scheduleDAL.findIfVerificationIsAvailable({
         date: minuteStart,
         user_id,
       });
 
-    if (checkIsAvailable) {
+    if (checkIfItisNotAvailable) {
       throw new errorHelpers.BadRequestError({
         message: 'The scheduled date is not available',
       });
@@ -101,6 +108,7 @@ class ScheduleService {
     const result = await this.scheduleDAL.update({
       id,
       date,
+      name,
       phone,
       description,
     });
