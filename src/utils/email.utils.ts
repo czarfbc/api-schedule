@@ -3,6 +3,7 @@ import { ISendEmail } from '../validations/interfaces/services/email.interfaces'
 import { env } from '../validations/z.schemas/env.z.schemas';
 import { emailSchema } from '../validations/z.schemas/email.z.schemas';
 import * as errorHelpers from '../helpers/error.helpers';
+import * as nodemailer from 'nodemailer';
 
 class EmailUtils {
   private resend: Resend;
@@ -12,6 +13,25 @@ class EmailUtils {
 
   async sendEmail({ inviteTo, subject, html }: ISendEmail) {
     const validateInput = emailSchema.parse({ inviteTo, subject, html });
+
+    // const transport = nodemailer.createTransport({
+    //   host: '',
+    //   port: ,
+    //   auth: {
+    //     user: '',
+    //     pass: '',
+    //   },
+    // });
+
+    // const mailOptions: nodemailer.SendMailOptions = {
+    //   from: process.env.NODEMAILER_EMAIL,
+    //   to: 'destination',
+    //   subject: subject,
+    //   html: 'content',
+    // };
+
+    // const info = await transport.sendMail(mailOptions);
+    // transport.close();
 
     const emailData = await this.resend.emails.send({
       from: 'ScheduleSystem <onboarding@resend.dev>',
