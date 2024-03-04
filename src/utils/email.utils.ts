@@ -1,44 +1,30 @@
-import { Resend } from 'resend';
 import { ISendEmail } from '../validations/interfaces/services/email.interfaces';
 import { env } from '../validations/z.schemas/env.z.schemas';
-import { emailSchema } from '../validations/z.schemas/email.z.schemas';
 import * as errorHelpers from '../helpers/error.helpers';
 import * as nodemailer from 'nodemailer';
 
 class EmailUtils {
-  private resend: Resend;
-  constructor() {
-    this.resend = new Resend(env.RESEND_KEY);
-  }
+  constructor() {}
 
   async sendEmail({ inviteTo, subject, html }: ISendEmail) {
-    const validateInput = emailSchema.parse({ inviteTo, subject, html });
-
-    // const transport = nodemailer.createTransport({
-    //   host: '',
-    //   port: ,
-    //   auth: {
-    //     user: '',
-    //     pass: '',
-    //   },
-    // });
-
-    // const mailOptions: nodemailer.SendMailOptions = {
-    //   from: process.env.NODEMAILER_EMAIL,
-    //   to: 'destination',
-    //   subject: subject,
-    //   html: 'content',
-    // };
-
-    // const info = await transport.sendMail(mailOptions);
-    // transport.close();
-
-    const emailData = await this.resend.emails.send({
-      from: 'ScheduleSystem <onboarding@resend.dev>',
-      to: validateInput.inviteTo,
-      subject: validateInput.subject,
-      html: validateInput.html,
+    var transport = nodemailer.createTransport({
+      host: env.HOST,
+      port: env.EMAIL_PORT,
+      auth: {
+        user: env.USER,
+        pass: env.PASS,
+      },
     });
+
+    const mailOptions: nodemailer.SendMailOptions = {
+      from: env.NODEMAILER_EMAIL,
+      to: inviteTo,
+      subject: subject,
+      html,
+    };
+
+    const emailData = await transport.sendMail(mailOptions);
+    transport.close();
 
     if (!emailData) {
       throw new errorHelpers.InternalServerError({
