@@ -8,11 +8,11 @@ class EmailUtils {
 
   async sendEmail({ inviteTo, subject, html }: ISendEmail) {
     var transport = nodemailer.createTransport({
-      host: env.HOST,
-      port: env.EMAIL_PORT,
+      host: 'sandbox.smtp.mailtrap.io',
+      port: 2525,
       auth: {
-        user: env.USER,
-        pass: env.PASS,
+        user: '025f8db6fff808',
+        pass: '5058a128519602',
       },
     });
 

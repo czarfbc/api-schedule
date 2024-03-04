@@ -44,7 +44,7 @@ class UserService {
     const emailData = await this.email.sendEmail({
       inviteTo: email,
       subject: 'Bem Vindo!!!',
-      html: `"<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
+      html: `<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
     });
 
     return { create, emailData };
