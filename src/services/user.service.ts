@@ -7,29 +7,24 @@ import { env } from '../validations/z.schemas/env.z.schemas';
 import * as userZSchemas from '../validations/z.schemas/user.z.schemas';
 import * as errorHelpers from '../helpers/error.helpers';
 import { RequestRateLimitUtils } from '../utils/request.rate.limit';
-import fs from 'fs';
-import path from 'path';
+import { MessagesHTMLUtils } from '../utils/messages.html.utils';
 
 class UserService {
   private userDAL: UserDAL;
   private email: EmailUtils;
   private requestRateLimit: RequestRateLimitUtils;
+  private messagesHTMLUtils: MessagesHTMLUtils;
   private invalidAttempts: Map<string, number>;
 
   constructor() {
     this.userDAL = new UserDAL();
     this.email = new EmailUtils();
     this.requestRateLimit = new RequestRateLimitUtils();
+    this.messagesHTMLUtils = new MessagesHTMLUtils();
     this.invalidAttempts = new Map();
   }
 
   async create({ name, email, password }: usersInterfaces.ICreateUser) {
-    const templatePath = path.resolve(
-      __dirname,
-      '../utils/templates.html/create.account.helpers.html'
-    );
-    const templateHTML = fs.readFileSync(templatePath, 'utf-8');
-
     const findUser = await this.userDAL.findUserByEmail(email);
     if (findUser) {
       throw new errorHelpers.BadRequestError({
@@ -52,7 +47,7 @@ class UserService {
     const emailData = await this.email.sendEmail({
       inviteTo: email,
       subject: 'Bem Vindo!!!',
-      html: templateHTML.replace('{{name}}', name),
+      html: this.messagesHTMLUtils.createAccount(name),
     });
 
     return { create, emailData };
@@ -217,10 +212,19 @@ class UserService {
       email: validateInput.email,
     });
 
+    if (!token.resetToken) {
+      throw new errorHelpers.InternalServerError({
+        message: 'Without password recovery token',
+      });
+    }
+
     const emailData = await this.email.sendEmail({
       inviteTo: email,
       subject: 'Recuperação de Senha!!!',
-      html: `"<p>codigo para recuperar senha <h1>${token.resetToken}</h1></p>`,
+      html: this.messagesHTMLUtils.forgotPassword(
+        findUser.name,
+        token.resetToken
+      ),
     });
 
     return emailData;
