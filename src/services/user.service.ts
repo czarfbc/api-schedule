@@ -7,6 +7,8 @@ import { env } from '../validations/z.schemas/env.z.schemas';
 import * as userZSchemas from '../validations/z.schemas/user.z.schemas';
 import * as errorHelpers from '../helpers/error.helpers';
 import { RequestRateLimitUtils } from '../utils/request.rate.limit';
+import fs from 'fs';
+import path from 'path';
 
 class UserService {
   private userDAL: UserDAL;
@@ -22,6 +24,12 @@ class UserService {
   }
 
   async create({ name, email, password }: usersInterfaces.ICreateUser) {
+    const templatePath = path.resolve(
+      __dirname,
+      '../utils/templates.html/create.account.helpers.html'
+    );
+    const templateHTML = fs.readFileSync(templatePath, 'utf-8');
+
     const findUser = await this.userDAL.findUserByEmail(email);
     if (findUser) {
       throw new errorHelpers.BadRequestError({
@@ -44,7 +52,7 @@ class UserService {
     const emailData = await this.email.sendEmail({
       inviteTo: email,
       subject: 'Bem Vindo!!!',
-      html: `<h1>Olá ${name}, seja bem vindo(a) ao seu novo sistema de agendamento</h1>`,
+      html: templateHTML.replace('{{name}}', name),
     });
 
     return { create, emailData };
