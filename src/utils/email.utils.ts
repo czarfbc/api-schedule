@@ -1,4 +1,4 @@
-import { ISendEmail } from '../validations/interfaces/services/email.interfaces';
+import { ISendEmail } from '../validations/interfaces/utils/email.interfaces';
 import { env } from '../validations/z.schemas/env.z.schemas';
 import * as errorHelpers from '../helpers/error.helpers';
 import * as nodemailer from 'nodemailer';

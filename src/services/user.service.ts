@@ -93,8 +93,16 @@ class UserService {
     });
 
     return {
-      token: { token, expiresIn: '60s' },
-      refreshToken: { refreshToken, expiresIn: '7d' },
+      tokenKeys: {
+        token: {
+          code: token,
+          expiresIn: '60s',
+        },
+        refreshToken: {
+          code: refreshToken,
+          expiresIn: '7d',
+        },
+      },
       user: {
         name: findUser.name,
         email: findUser.email,
@@ -218,13 +226,14 @@ class UserService {
       });
     }
 
+    const replaceInHTML = this.messagesHTMLUtils.forgotPassword({
+      name: findUser.name,
+      token: token.resetToken,
+    });
     const emailData = await this.email.sendEmail({
       inviteTo: email,
       subject: 'Recuperação de Senha!!!',
-      html: this.messagesHTMLUtils.forgotPassword(
-        findUser.name,
-        token.resetToken
-      ),
+      html: replaceInHTML,
     });
 
     return emailData;
@@ -257,6 +266,7 @@ class UserService {
       newPassword: hashedPassword,
       email: findUser.email,
     });
+
     return result;
   }
 }

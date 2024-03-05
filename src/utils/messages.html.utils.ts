@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { IForgotPassword } from '../validations/interfaces/utils/messages.html.interface';
 
 class MessagesHTMLUtils {
   createAccount(name: string) {
@@ -15,7 +16,7 @@ class MessagesHTMLUtils {
     return result;
   }
 
-  forgotPassword(name: string, token: string) {
+  forgotPassword({ name, token }: IForgotPassword) {
     const templatePath = path.resolve(
       __dirname,
       '../helpers/templates.html/forgot.pass.helpers.html'
