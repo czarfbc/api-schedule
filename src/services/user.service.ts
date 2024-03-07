@@ -75,8 +75,8 @@ class UserService {
       });
     }
 
-    let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
-    let secretKey: string = env.ACCESS_KEY_TOKEN;
+    const secretKeyRefreshToken = env.ACCESS_KEY_TOKEN_REFRESH;
+    const secretKey = env.ACCESS_KEY_TOKEN;
     if (!secretKey || !secretKeyRefreshToken) {
       throw new errorHelpers.VariantAlsoNegotiatesError({
         message: 'There is no token key or refresh token key',
@@ -117,8 +117,8 @@ class UserService {
       });
     }
 
-    let secretKeyRefreshToken: string = env.ACCESS_KEY_TOKEN_REFRESH;
-    let secretKey: string = env.ACCESS_KEY_TOKEN;
+    const secretKeyRefreshToken = env.ACCESS_KEY_TOKEN_REFRESH;
+    const secretKey = env.ACCESS_KEY_TOKEN;
     if (!secretKey || !secretKeyRefreshToken) {
       throw new errorHelpers.VariantAlsoNegotiatesError({
         message: 'There is no token key or refresh token key',

@@ -7,7 +7,7 @@ class EmailUtils {
   constructor() {}
 
   async sendEmail({ inviteTo, subject, html }: ISendEmail) {
-    var transport = nodemailer.createTransport({
+    const transport = nodemailer.createTransport({
       host: 'sandbox.smtp.mailtrap.io',
       port: 2525,
       auth: {

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { UserService } from '../services/user.service';
 
 class UserController {
@@ -7,7 +7,7 @@ class UserController {
     this.userService = new UserService();
   }
 
-  async create(request: Request, response: Response, next: NextFunction) {
+  async create(request: Request, response: Response) {
     const { name, email, password } = request.body;
 
     const result = await this.userService.create({ name, email, password });
@@ -15,7 +15,7 @@ class UserController {
     return response.status(201).json({ result });
   }
 
-  async auth(request: Request, response: Response, next: NextFunction) {
+  async auth(request: Request, response: Response) {
     const { email, password } = request.body;
 
     const result = await this.userService.auth({ email, password });
@@ -23,7 +23,7 @@ class UserController {
     return response.json(result);
   }
 
-  async refresh(request: Request, response: Response, next: NextFunction) {
+  async refresh(request: Request, response: Response) {
     const { refreshToken } = request.body;
 
     const result = await this.userService.refresh(refreshToken);
@@ -31,7 +31,7 @@ class UserController {
     return response.json(result);
   }
 
-  async update(request: Request, response: Response, next: NextFunction) {
+  async update(request: Request, response: Response) {
     const { name, oldPassword, newPassword } = request.body;
     const { user_id } = request;
 
@@ -45,11 +45,7 @@ class UserController {
     return response.status(200).json(result);
   }
 
-  async forgotPassword(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) {
+  async forgotPassword(request: Request, response: Response) {
     const { email } = request.body;
     const ip = request.clientIp;
 
@@ -58,11 +54,7 @@ class UserController {
     return response.status(200).json(result);
   }
 
-  async recoveryPassword(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) {
+  async recoveryPassword(request: Request, response: Response) {
     const { resetToken } = request.query as { resetToken: string };
     const { newPassword } = request.body;
 

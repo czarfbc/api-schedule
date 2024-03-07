@@ -2,7 +2,6 @@ import * as schedulesInterfaces from '../validations/interfaces/services/schedul
 import { isBefore, startOfMinute } from 'date-fns';
 import { ScheduleDAL } from '../database/data.access.layer/schedule.dal';
 import * as errorHelpers from '../helpers/error.helpers';
-import * as scheduleZSchemas from '../validations/z.schemas/schedule.z.schemas';
 
 class ScheduleService {
   private scheduleDAL: ScheduleDAL;

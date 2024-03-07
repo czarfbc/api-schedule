@@ -7,10 +7,13 @@
     "node": "20"
   },
   "scripts": {
-    "start:test": "jest",
+    "test": "jest",
     "start:dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server.ts",
     "start:prod": "node dist/server.js",
-    "start:build": "npx tsc"
+    "build": "npx tsc",
+    "prepare": "husky",
+    "check": "eslint . --ext .ts",
+    "check:fix": "eslint . --ext .ts --fix"
   },
   "keywords": [],
   "author": "",
@@ -21,8 +24,10 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/nodemailer": "^6.4.14",
     "@types/uuid": "^9.0.1",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "eslint": "^8.57.0",
     "prisma": "^4.17.0-dev.47",
-    "tailwindcss": "^3.4.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
   },
@@ -42,7 +47,6 @@
     "nodemailer": "^6.9.7",
     "redis": "^4.6.13",
     "request-ip": "^3.3.0",
-    "resend": "^2.0.0",
     "ts-jest": "^29.1.2",
     "zod": "^3.22.4"
   }

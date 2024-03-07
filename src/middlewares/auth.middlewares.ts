@@ -16,7 +16,7 @@ class AuthMiddlewares {
 
     const [, token] = authHeader.split(' ');
 
-    let secretkey: string = env.ACCESS_KEY_TOKEN;
+    const secretkey: string = env.ACCESS_KEY_TOKEN;
     if (!secretkey) {
       throw new VariantAlsoNegotiatesError({
         message: 'There is no token key',

@@ -1,5 +1,5 @@
 class RequestRateLimitUtils {
-  private blocked: Map<String, number> = new Map();
+  private blocked: Map<string, number> = new Map();
 
   blockedIP(ip: string): void {
     const fiveteen: number = 900000;
