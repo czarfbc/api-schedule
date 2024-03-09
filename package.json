@@ -13,17 +13,10 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "prepare": "husky"
   },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@commitlint/cli": "^19.0.3",
-    "@commitlint/config-conventional": "^19.0.3",
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.17",
