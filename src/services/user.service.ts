@@ -46,7 +46,7 @@ class UserService {
 
     const emailData = await this.email.sendEmail({
       inviteTo: email,
-      subject: 'Bem Vindo!!!',
+      subject: 'Welcome!!!',
       html: this.messagesHTMLUtils.createAccount(name),
     });
 
@@ -232,7 +232,7 @@ class UserService {
     });
     const emailData = await this.email.sendEmail({
       inviteTo: email,
-      subject: 'Recuperação de Senha!!!',
+      subject: 'Recover Pass!!!',
       html: replaceInHTML,
     });
 
