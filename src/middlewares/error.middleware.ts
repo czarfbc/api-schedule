@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { ErrorHelpers } from '../helpers/error.helpers';
 
@@ -6,7 +6,9 @@ class ErrorMiddlewares {
   handleError(
     error: Error & Partial<ErrorHelpers>,
     request: Request,
-    response: Response
+    response: Response,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    next: NextFunction
   ) {
     if (error instanceof ZodError) {
       const validationErrors = error.errors.map((err) => err.message);
