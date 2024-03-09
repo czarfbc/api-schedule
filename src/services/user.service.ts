@@ -135,6 +135,7 @@ class UserService {
     const newRefreshToken = sign({ sub }, secretKeyRefreshToken, {
       expiresIn: '7d',
     });
+
     return {
       token: { token: newToken, expiresIn: '1h' },
       refreshToken: { refreshToken: newRefreshToken, expiresIn: '7d' },
