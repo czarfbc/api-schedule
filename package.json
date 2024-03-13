@@ -6,7 +6,6 @@
   "engines": {
     "node": "20"
   },
-  "type": "module",
   "scripts": {
     "start:dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server.ts",
     "start:prod": "node dist/server.js",
