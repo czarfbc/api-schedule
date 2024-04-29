@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const createSchemaSchedules = z.object({
+export const createSchemaSchedule = z.object({
   name: z
     .string()
     .min(3, { message: 'Name must be at least 3 characters long' }),
@@ -10,7 +10,7 @@ export const createSchemaSchedules = z.object({
   description: z.string(),
 });
 
-export const findSchemaSchedules = z.object({
+export const findSchemaSchedule = z.object({
   date: z.coerce.date(),
   user_id: z.string().uuid(),
 });

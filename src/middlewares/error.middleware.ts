@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
-import { ErrorsHelpers } from '../helpers/errors.helpers';
+import { ErrorHelpers } from '../helpers/error.helpers';
 
-class ErrorsMiddlewares {
+class ErrorMiddlewares {
   handleError(
-    error: Error & Partial<ErrorsHelpers>,
+    error: Error & Partial<ErrorHelpers>,
     request: Request,
     response: Response,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     next: NextFunction
   ) {
     if (error instanceof ZodError) {
@@ -23,4 +24,4 @@ class ErrorsMiddlewares {
   }
 }
 
-export { ErrorsMiddlewares };
+export { ErrorMiddlewares };
