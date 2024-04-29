@@ -1,18 +1,19 @@
 import 'express-async-errors';
 import express, { Application } from 'express';
-import { UserRoutes } from './routes/users.routes';
-import { SchedulesRoutes } from './routes/schedules.routes';
-import { ErrorsMiddlewares } from './middlewares/errors.middleware';
+import { UserRoutes } from './routes/user.routes';
+import { SchedulesRoutes } from './routes/schedule.routes';
+import { SwaggerRoutes } from './routes/swagger.router';
+import { ErrorMiddlewares } from './middlewares/error.middleware';
 import cors, { CorsOptions } from 'cors';
 import requestIp from 'request-ip';
 
 export class App {
   private app: Application;
-  private errorsMiddlewares: ErrorsMiddlewares;
+  private errorMiddlewares: ErrorMiddlewares;
 
   constructor(corsConfig: CorsOptions) {
     this.app = express();
-    this.errorsMiddlewares = new ErrorsMiddlewares();
+    this.errorMiddlewares = new ErrorMiddlewares();
     this.middleware(corsConfig);
     this.setupAllRoutes();
   }
@@ -27,18 +28,28 @@ export class App {
   private setupAllRoutes() {
     this.setupUsersRoutes();
     this.setupSchedulesRoutes();
+    this.setupSwaggerDocs();
+  }
+
+  private setupSwaggerDocs() {
+    const swaggerRoutes = new SwaggerRoutes();
+    const swaggerBaseRoute = '/api-docs';
+
+    this.app.use(swaggerBaseRoute, swaggerRoutes.useRoutes());
   }
 
   private setupUsersRoutes() {
     const userRouters = new UserRoutes();
-    const userBaseRoute = '/users';
+    const userBaseRoute = '/user';
+
     this.app.use(userBaseRoute, userRouters.postRoutes());
     this.app.use(userBaseRoute, userRouters.patchRoutes());
   }
 
   private setupSchedulesRoutes() {
     const schedulesRoutes = new SchedulesRoutes();
-    const scheduleBaseRoute = '/schedules';
+    const scheduleBaseRoute = '/schedule';
+
     this.app.use(scheduleBaseRoute, schedulesRoutes.postRoutes());
     this.app.use(scheduleBaseRoute, schedulesRoutes.getRoutes());
     this.app.use(scheduleBaseRoute, schedulesRoutes.patchRoutes());
@@ -47,10 +58,10 @@ export class App {
 
   public listen(port: number) {
     this.app.listen(port, () => {
-      console.log(`Servidor rodando na porta ${port}`);
+      console.log(
+        `\x1b[38;2;0;255;0mServer running on:\x1b[0m \x1b[38;2;0;255;255mhttp://localhost:${port}\x1b[0m `
+      );
     });
-    this.app.use(
-      this.errorsMiddlewares.handleError.bind(this.errorsMiddlewares)
-    );
+    this.app.use(this.errorMiddlewares.handleError.bind(this.errorMiddlewares));
   }
 }

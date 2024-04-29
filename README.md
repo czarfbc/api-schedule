@@ -5,7 +5,7 @@
 Será nescessário instalar as dependencias
 
 ```bash
-$ yarn install
+$ npm ci
 $ npm install prisma --save-dev
 ```
 

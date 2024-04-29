@@ -1,29 +1,34 @@
-import { Resend } from 'resend';
-import { ISendEmail } from '../validations/interfaces/services/email.interfaces';
+import { ISendEmail } from '../validations/interfaces/utils/email.interfaces';
 import { env } from '../validations/z.schemas/env.z.schemas';
-import { emailSchema } from '../validations/z.schemas/email.z.schemas';
-import { ErrorsHelpers } from '../helpers/errors.helpers';
+import * as errorHelpers from '../helpers/error.helpers';
+import * as nodemailer from 'nodemailer';
 
 class EmailUtils {
-  private resend: Resend;
-  constructor() {
-    this.resend = new Resend(env.RESEND_KEY);
-  }
+  constructor() {}
 
   async sendEmail({ inviteTo, subject, html }: ISendEmail) {
-    const validateInput = emailSchema.parse({ inviteTo, subject, html });
-
-    const emailData = await this.resend.emails.send({
-      from: 'ScheduleSystem <onboarding@resend.dev>',
-      to: validateInput.inviteTo,
-      subject: validateInput.subject,
-      html: validateInput.html,
+    const transport = nodemailer.createTransport({
+      host: 'sandbox.smtp.mailtrap.io',
+      port: 2525,
+      auth: {
+        user: '025f8db6fff808',
+        pass: '5058a128519602',
+      },
     });
 
+    const mailOptions: nodemailer.SendMailOptions = {
+      from: env.NODEMAILER_EMAIL,
+      to: inviteTo,
+      subject: subject,
+      html,
+    };
+
+    const emailData = await transport.sendMail(mailOptions);
+    transport.close();
+
     if (!emailData) {
-      throw new ErrorsHelpers({
+      throw new errorHelpers.InternalServerError({
         message: 'Error sending email',
-        statusCode: 500,
       });
     }
 

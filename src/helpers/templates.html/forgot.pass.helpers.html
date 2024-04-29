@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        padding: 8px;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Roboto', sans-serif;
+        font-style: normal;
+      }
+
+      .header {
+        width: 100%;
+        background-color: rgb(15, 118, 110);
+        display: flex;
+        justify-content: center;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .header h1 {
+        font-size: 1.875rem;
+        line-height: 2.25rem;
+        color: rgb(226 232 240);
+      }
+
+      .text {
+        font-size: 1.5rem;
+        line-height: 2rem;
+      }
+
+      .btn {
+        width: 100%;
+        display: flex;
+        margin-top: 10%;
+        justify-content: center;
+      }
+      .btn a {
+        padding: 16px 24px;
+        background-color: rgb(15 118 110);
+        text-decoration: none;
+        color: rgb(226 232 240);
+        font-weight: 500;
+        border-radius: 4px;
+        box-shadow: 0px 10px 15px 1px rgb(15 15 15);
+      }
+      .btn a:hover {
+        padding: 16px 24px;
+        background-color: rgb(25 128 120);
+        box-shadow: 0px 10px 13px 0px rgb(15 15 15);
+      }
+
+      .footer {
+        height: 68px;
+        background-color: rgb(15 118 110);
+        position: fixed;
+        bottom: 0.5rem;
+        width: calc(100% - 1rem);
+      }
+    </style>
+    <title>Reset Password</title>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Reset Password</h1>
+    </div>
+    <h1 class="text">
+      Hi {{name}}, it looks like you are trying to recover your password, click
+      the button below to complete this step.
+    </h1>
+    <p>While you don't have the link, use this token {{token}}</p>
+    <div class="btn">
+      <a href="https://{{link}}" target="_blank" rel="noopener noreferrer"
+        >Reset Password</a
+      >
+    </div>
+    <div class="footer"></div>
+  </body>
+</html>

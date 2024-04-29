@@ -1,22 +1,22 @@
-export interface ICreateUsers {
+export interface ICreateUser {
   name: string;
   email: string;
   password: string;
 }
 
-export interface IUpdateUsers {
+export interface IUpdateUser {
   name: string;
   oldPassword?: string;
   newPassword: string;
   user_id: string;
 }
 
-export interface IAuthUsers {
+export interface IAuthUser {
   email: string;
   password: string;
 }
 
-export interface IUsersUpdateResetToken {
+export interface IUserUpdateResetToken {
   resetToken: string;
   resetTokenExpiry: Date;
   email: string;
