@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { UserController } from '../controllers/user.cotroller';
+import { UserController } from '../controllers/user.cotrollers';
 import { AuthMiddlewares } from '../middlewares/auth.middlewares';
 
 class UserRoutes {

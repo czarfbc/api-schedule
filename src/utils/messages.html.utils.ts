@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { IForgotPassword } from '../validations/interfaces/utils/messages.html.interface';
+import { IForgotPassword } from '../validations/interfaces/utils/messages.html.interfaces';
 
 class MessagesHTMLUtils {
   createAccount(name: string) {

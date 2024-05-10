@@ -2,8 +2,8 @@ class RequestRateLimitUtils {
   private blocked: Map<string, number> = new Map();
 
   blockedIP(ip: string): void {
-    const fiveteen: number = 900000;
-    this.blocked.set(ip, Date.now() + fiveteen);
+    const fiveTeen: number = 900000;
+    this.blocked.set(ip, Date.now() + fiveTeen);
   }
 
   checkIfTheIpIsBlocked(ip: string): boolean {

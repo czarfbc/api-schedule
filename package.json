@@ -38,6 +38,8 @@
   },
   "dependencies": {
     "@prisma/client": "^4.17.0-dev.47",
+    "0x": "^5.7.0",
+    "autocannon": "^7.15.0",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "date-fns": "^2.30.0",

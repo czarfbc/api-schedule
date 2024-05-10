@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
-import swaggerUserDocs from '../docs/swagger.user.json';
-import swaggerScheduleDocs from '../docs/swagger.schedule.json';
+import swaggerUserDocs from '../docs/user.docs.json';
+import swaggerScheduleDocs from '../docs/schedule.docs.json';
 
 class SwaggerRoutes {
   private router: Router;

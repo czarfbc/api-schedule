@@ -8,7 +8,7 @@ const envSchema = z.object({
   PORT: z.coerce.number(),
 
   //EMAIL
-  RESEND_KEY: z.string(),
+  //RESEND_KEY: z.string(),
   HOST: z.string(),
   EMAIL_PORT: z.coerce.number(),
   USER: z.string(),

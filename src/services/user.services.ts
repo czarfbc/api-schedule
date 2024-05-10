@@ -3,10 +3,10 @@ import * as usersInterfaces from '../validations/interfaces/services/user.interf
 import { UserDAL } from '../database/data.access.layer/user.dal';
 import { sign, verify } from 'jsonwebtoken';
 import { EmailUtils } from '../utils/email.utils';
-import { env } from '../validations/z.schemas/env.z.schemas';
-import * as userZSchemas from '../validations/z.schemas/user.z.schemas';
+import { env } from '../validations/z.schemas/env.schemas';
+import * as userZSchemas from '../validations/z.schemas/user.schemas';
 import * as errorHelpers from '../helpers/error.helpers';
-import { RequestRateLimitUtils } from '../utils/request.rate.limit';
+import { RequestRateLimitUtils } from '../utils/request.rate.limit.utils';
 import { MessagesHTMLUtils } from '../utils/messages.html.utils';
 
 class UserService {

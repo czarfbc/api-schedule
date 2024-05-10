@@ -2,8 +2,8 @@ import 'express-async-errors';
 import express, { Application } from 'express';
 import { UserRoutes } from './routes/user.routes';
 import { SchedulesRoutes } from './routes/schedule.routes';
-import { SwaggerRoutes } from './routes/swagger.router';
-import { ErrorMiddlewares } from './middlewares/error.middleware';
+import { SwaggerRoutes } from './routes/swagger.routes';
+import { ErrorMiddlewares } from './middlewares/error.middlewares';
 import cors, { CorsOptions } from 'cors';
 import requestIp from 'request-ip';
 

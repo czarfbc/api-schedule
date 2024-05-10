@@ -10,11 +10,6 @@ export const createSchemaSchedule = z.object({
   description: z.string(),
 });
 
-export const findSchemaSchedule = z.object({
-  date: z.coerce.date(),
-  user_id: z.string().uuid(),
-});
-
 export const updateSchemaSchedule = z.object({
   id: z.string().uuid(),
   date: z.coerce.date(),

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ScheduleService } from '../services/schedule.service';
+import { ScheduleService } from '../services/schedule.services';
 import { parseISO } from 'date-fns';
 
 class ScheduleController {

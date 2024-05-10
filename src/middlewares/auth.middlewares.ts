@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 import { IPayload } from '../validations/interfaces/services/user.interfaces';
-import { env } from '../validations/z.schemas/env.z.schemas';
+import { env } from '../validations/z.schemas/env.schemas';
 import { VariantAlsoNegotiatesError } from '../helpers/error.helpers';
 
 class AuthMiddlewares {
